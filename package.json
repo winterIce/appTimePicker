@@ -1,0 +1,26 @@
+{
+  "name": "apptimepicker",
+  "version": "1.0.0",
+  "description": "移动端日期组件(react版)",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/winterIce/appTimePicker.git"
+  },
+  "author": "Winter",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/winterIce/appTimePicker/issues"
+  },
+  "homepage": "https://github.com/winterIce/appTimePicker#readme",
+  "dependencies": {
+    "react": "^15.4.2",
+    "react-dom": "^15.4.2"
+  },
+  "devDependencies": {
+    "webpack": "^2.2.1"
+  }
+}
