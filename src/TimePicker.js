@@ -22,8 +22,8 @@ export default class TimePicker extends Component {
             	width: 0,
             	height: 0,
             },
-            desX: 0,
-            desY: 0,
+            desX: 0, //move过程中的transform-x的值
+            desY: 0, //move过程中的transform-y的值
 		};
 	}
 	componentWillMount() {
@@ -58,19 +58,19 @@ export default class TimePicker extends Component {
             }
             event.preventDefault();
             var evt = event.touches[0] || event;
-            var moveX = evt.pageX - that.state.evtStartX;
+            //var moveX = evt.pageX - that.state.evtStartX;
             var moveY = evt.pageY - that.state.evtStartY;
             
-            var desLeft = that.state.objBounding.left + moveX;
-            var desRight = that.state.objBounding.right + moveX;
+            //var desLeft = that.state.objBounding.left + moveX;
+            //var desRight = that.state.objBounding.right + moveX;
             var desTop = that.state.objBounding.top + moveY;
             var desBottom = that.state.objBounding.bottom + moveY;
-            if(desLeft < 0) {
-            	moveX = -that.state.objBounding.left;
-            }
-            if(desRight > winWidth) {
-            	moveX = winWidth - that.state.objBounding.right;
-            }
+            // if(desLeft < 0) {
+            // 	moveX = -that.state.objBounding.left;
+            // }
+            // if(desRight > winWidth) {
+            // 	moveX = winWidth - that.state.objBounding.right;
+            // }
             if(desTop < 0) {
             	moveY = -that.state.objBounding.top;
             }
@@ -78,9 +78,9 @@ export default class TimePicker extends Component {
             	moveY = winHeight - that.state.objBounding.bottom;
             }
             
-            var desX = that.state.objTranslate.x + moveX;
+            //var desX = that.state.objTranslate.x + moveX;
             var desY = that.state.objTranslate.y + moveY;
-            that.moveElement(ele, desX, desY);
+            that.moveElement(ele, 0, desY);
         });
         
         document.addEventListener('touchend', function(event) {
