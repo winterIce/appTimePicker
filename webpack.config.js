@@ -6,10 +6,11 @@ var path = require('path');
 module.exports = {
 	entry: {
 		app: path.resolve(__dirname, 'src/app'),
-	}
+	},
 	output: {
-		path: path.resolve(__dirname, 'build');
-		filename: '[name]-[hash:8].js',
+		path: path.resolve(__dirname, 'build'),
+		// filename: '[name]-[hash:8].js',
+        filename: '[name].js',
 	},
 	module: {
 		loaders: [
@@ -85,12 +86,12 @@ module.exports = {
         // }
 	],
 	externals: {
-		'jquery': 'jQuery',
+		'jquery': 'jQuery', //外部链接
 		'react': 'React',
 		'react-dom': 'ReactDOM',
-	}
+	},
 	resolve: {
-		extensions:['', 'js', 'jsx'],
+		extensions:['', '.js', '.jsx'],//require的时候不用写后缀
 		alias: {
 			'react': path.resolve(__dirname, 'node_modules/react/dist/react.min'),
 			'react-dom': path.resolve(__dirname, 'node_modules/react-dom/dist/react-dom.min'),

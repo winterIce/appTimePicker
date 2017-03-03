@@ -1,0 +1,14 @@
+@charset "utf-8";
+
+html, body, div, p, a, span {
+	margin: 0;
+	padding: 0;
+}
+html, body {
+	height: 100%;
+}
+.w-item {
+	width: 1rem;
+	height: 1rem;
+	background: #f00;
+}
