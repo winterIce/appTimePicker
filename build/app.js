@@ -79,7 +79,7 @@
 	'use strict';
 
 	Object.defineProperty(exports, "__esModule", {
-		value: true
+	  value: true
 	});
 
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -98,46 +98,165 @@
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
+	var winWidth = window.innerWidth;
+	var winHeight = window.innerHeight;
+
 	var TimePicker = function (_Component) {
-		_inherits(TimePicker, _Component);
+	  _inherits(TimePicker, _Component);
 
-		function TimePicker(props) {
-			_classCallCheck(this, TimePicker);
+	  function TimePicker(props) {
+	    _classCallCheck(this, TimePicker);
 
-			var _this = _possibleConstructorReturn(this, (TimePicker.__proto__ || Object.getPrototypeOf(TimePicker)).call(this, props));
+	    var _this = _possibleConstructorReturn(this, (TimePicker.__proto__ || Object.getPrototypeOf(TimePicker)).call(this, props));
 
-			_this.state = {};
-			return _this;
-		}
+	    _this.state = {
+	      evtStartX: 0,
+	      evtStartY: 0,
+	      touching: false,
+	      objTranslate: {
+	        x: 0,
+	        y: 0
+	      },
+	      objBounding: {
+	        left: 0,
+	        right: 0,
+	        top: 0,
+	        bottom: 0,
+	        width: 0,
+	        height: 0
+	      },
+	      desX: 0,
+	      desY: 0
+	    };
+	    return _this;
+	  }
 
-		_createClass(TimePicker, [{
-			key: 'componentWillMount',
-			value: function componentWillMount() {}
-		}, {
-			key: 'componentDidMount',
-			value: function componentDidMount() {}
-		}, {
-			key: 'componentDidUpdate',
-			value: function componentDidUpdate() {}
-		}, {
-			key: 'componentWillUnmount',
-			value: function componentWillUnmount() {}
-		}, {
-			key: 'render',
-			value: function render() {
-				return _react2.default.createElement(
-					'div',
-					null,
-					_react2.default.createElement(
-						'div',
-						{ className: 'w-item' },
-						'123'
-					)
-				);
-			}
-		}]);
+	  _createClass(TimePicker, [{
+	    key: 'componentWillMount',
+	    value: function componentWillMount() {}
+	  }, {
+	    key: 'componentDidMount',
+	    value: function componentDidMount() {
+	      var ele = document.querySelectorAll('.time-item')[1];
+	      this.moveElement(ele, 0, 0);
+	      var that = this;
 
-		return TimePicker;
+	      ele.addEventListener('touchstart', function (event) {
+	        var evt = event.touches[0] || event;
+	        var rect = ele.getBoundingClientRect();
+	        that.setState({
+	          evtStartX: evt.pageX,
+	          evtStartY: evt.pageY,
+	          touching: true,
+	          objBounding: {
+	            left: rect.left,
+	            right: rect.right,
+	            top: rect.top,
+	            bottom: rect.bottom,
+	            width: rect.width,
+	            height: rect.height
+	          }
+	        });
+	      });
+
+	      document.addEventListener('touchmove', function (event) {
+	        if (!that.state.touching) {
+	          return;
+	        }
+	        event.preventDefault();
+	        var evt = event.touches[0] || event;
+	        var moveX = evt.pageX - that.state.evtStartX;
+	        var moveY = evt.pageY - that.state.evtStartY;
+
+	        var desLeft = that.state.objBounding.left + moveX;
+	        var desRight = that.state.objBounding.right + moveX;
+	        var desTop = that.state.objBounding.top + moveY;
+	        var desBottom = that.state.objBounding.bottom + moveY;
+	        if (desLeft < 0) {
+	          moveX = -that.state.objBounding.left;
+	        }
+	        if (desRight > winWidth) {
+	          moveX = winWidth - that.state.objBounding.right;
+	        }
+	        if (desTop < 0) {
+	          moveY = -that.state.objBounding.top;
+	        }
+	        if (desBottom > winHeight) {
+	          moveY = winHeight - that.state.objBounding.bottom;
+	        }
+
+	        var desX = that.state.objTranslate.x + moveX;
+	        var desY = that.state.objTranslate.y + moveY;
+	        that.moveElement(ele, desX, desY);
+	      });
+
+	      document.addEventListener('touchend', function (event) {
+	        that.setState({
+	          touching: false
+	        });
+	        that.setState({
+	          objTranslate: {
+	            x: that.state.desX,
+	            y: that.state.desY
+	          }
+	        });
+	      });
+	    }
+	  }, {
+	    key: 'componentDidUpdate',
+	    value: function componentDidUpdate() {}
+	  }, {
+	    key: 'componentWillUnmount',
+	    value: function componentWillUnmount() {}
+	  }, {
+	    key: 'moveElement',
+	    value: function moveElement(ele, x, y) {
+	      var x = Math.round(1000 * x) / 1000;
+	      var y = Math.round(1000 * y) / 1000;
+
+	      ele.style.webkitTransform = 'translate(' + x + 'px,' + y + 'px)';
+	      ele.style.transform = 'translate3d(' + x + 'px,' + y + 'px, 0)';
+	      this.setState({
+	        desX: x,
+	        desY: y
+	      });
+	    }
+	  }, {
+	    key: 'render',
+	    value: function render() {
+	      return _react2.default.createElement(
+	        'div',
+	        { className: 'time-picker-outer' },
+	        _react2.default.createElement(
+	          'div',
+	          { className: 'time-item' },
+	          '1'
+	        ),
+	        _react2.default.createElement(
+	          'div',
+	          { className: 'time-item' },
+	          '2'
+	        ),
+	        _react2.default.createElement(
+	          'div',
+	          { className: 'time-item' },
+	          '3'
+	        ),
+	        _react2.default.createElement(
+	          'div',
+	          { className: 'time-item' },
+	          '4'
+	        ),
+	        _react2.default.createElement(
+	          'div',
+	          { className: 'time-item' },
+	          '5'
+	        )
+	      );
+	    }
+	  }]);
+
+	  return TimePicker;
 	}(_react.Component);
 
 	exports.default = TimePicker;
@@ -177,7 +296,7 @@
 
 
 	// module
-	exports.push([module.id, "@charset \"utf-8\";\r\n\r\nhtml, body, div, p, a, span {\r\n\tmargin: 0;\r\n\tpadding: 0;\r\n}\r\nhtml, body {\r\n\theight: 100%;\r\n}\r\n.w-item {\r\n\twidth: 1rem;\r\n\theight: 1rem;\r\n\tbackground: #f00;\r\n}", ""]);
+	exports.push([module.id, "@charset \"utf-8\";\r\n\r\nhtml, body, div, p, a, span {\r\n\tmargin: 0;\r\n\tpadding: 0;\r\n}\r\nhtml, body {\r\n\theight: 100%;\r\n}\r\n\r\n.time-picker-outer {\r\n\tdisplay: -webkit-box;\r\n\tdisplay: -ms-flexbox;\r\n\tdisplay: -webkit-flex;\r\n\tdisplay: flex;\r\n\twidth: 100%;\r\n}\r\n.time-item {\r\n\t-webkit-box-flex: 1;\r\n\tflex: 1;\r\n\theight: 30rem;\r\n\tbackground: #ccc;\r\n\ttext-align: center;\r\n}", ""]);
 
 	// exports
 
