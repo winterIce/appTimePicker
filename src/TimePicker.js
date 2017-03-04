@@ -24,6 +24,14 @@ export default class TimePicker extends Component {
             },
             desX: 0, //move过程中的transform-x的值
             desY: 0, //move过程中的transform-y的值
+
+            touchMoveX: 0,//记录每一帧touchMove的X坐标
+            touchMoveY: 0,//记录每一帧touchMove的y坐标
+            touchMoveTime: 0, //记录每一帧的时间戳
+
+            touchEndX: 0,//记录touchend的X坐标
+            touchEndY: 0,//记录touchend的Y坐标
+            touchEndTime: 0,//记录touchend的时间戳
 		};
 	}
 	componentWillMount() {
@@ -58,6 +66,11 @@ export default class TimePicker extends Component {
             }
             event.preventDefault();
             var evt = event.touches[0] || event;
+            that.setState({
+                touchMoveX: evt.pageX,
+                touchMoveY: evt.pageY,
+                touchMoveTime: +new Date(),
+            });
             //var moveX = evt.pageX - that.state.evtStartX;
             var moveY = evt.pageY - that.state.evtStartY;
             
@@ -84,15 +97,23 @@ export default class TimePicker extends Component {
         });
         
         document.addEventListener('touchend', function(event) {
+            var evt = event.touches[0] || event;
             that.setState({
         	    touching: false,
-        	});
-        	that.setState({
-	            objTranslate: {
-	            	x: that.state.desX,
-	            	y: that.state.desY,
-	            }
-	        });
+            	objTranslate: {
+                    //x: that.state.desX,
+                    y: that.state.desY,
+                },
+                //touchEndX: evt.pageX,
+                touchEndY: evt.pageY,
+                touchEndTime: +new Date(),
+            });
+
+            var moveY = that.state.touchEndY - that.state.touchMoveY;
+            var moveX = that.state.touchEndX - that.state.touchMoveX;
+            var dis = moveY;
+            var time = that.state.touchEndTime - that.state.touchMoveTime;
+            var speed = dis / time * 16.66;
         });
 	}
 	componentDidUpdate() {
@@ -110,7 +131,7 @@ export default class TimePicker extends Component {
         this.setState({
         	desX: x,
         	desY: y,
-        })
+        });
 	}
 
 	render() {

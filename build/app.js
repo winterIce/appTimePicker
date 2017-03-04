@@ -126,7 +126,15 @@
 	        height: 0
 	      },
 	      desX: 0, //move过程中的transform-x的值
-	      desY: 0 };
+	      desY: 0, //move过程中的transform-y的值
+
+	      touchMoveX: 0, //记录每一帧touchMove的X坐标
+	      touchMoveY: 0, //记录每一帧touchMove的y坐标
+	      touchMoveTime: 0, //记录每一帧的时间戳
+
+	      touchEndX: 0, //记录touchend的X坐标
+	      touchEndY: 0, //记录touchend的Y坐标
+	      touchEndTime: 0 };
 	    return _this;
 	  }
 
@@ -164,6 +172,11 @@
 	        }
 	        event.preventDefault();
 	        var evt = event.touches[0] || event;
+	        that.setState({
+	          touchMoveX: evt.pageX,
+	          touchMoveY: evt.pageY,
+	          touchMoveTime: +new Date()
+	        });
 	        //var moveX = evt.pageX - that.state.evtStartX;
 	        var moveY = evt.pageY - that.state.evtStartY;
 
@@ -190,15 +203,23 @@
 	      });
 
 	      document.addEventListener('touchend', function (event) {
+	        var evt = event.touches[0] || event;
 	        that.setState({
-	          touching: false
-	        });
-	        that.setState({
+	          touching: false,
 	          objTranslate: {
-	            x: that.state.desX,
+	            //x: that.state.desX,
 	            y: that.state.desY
-	          }
+	          },
+	          //touchEndX: evt.pageX,
+	          touchEndY: evt.pageY,
+	          touchEndTime: +new Date()
 	        });
+
+	        var moveY = that.state.touchEndY - that.state.touchMoveY;
+	        var moveX = that.state.touchEndX - that.state.touchMoveX;
+	        var dis = moveY;
+	        var time = that.state.touchEndTime - that.state.touchMoveTime;
+	        var speed = dis / time * 16.66;
 	      });
 	    }
 	  }, {
@@ -295,7 +316,7 @@
 
 
 	// module
-	exports.push([module.id, "@charset \"utf-8\";\r\n\r\nhtml, body, div, p, a, span {\r\n\tmargin: 0;\r\n\tpadding: 0;\r\n}\r\nhtml, body {\r\n\theight: 100%;\r\n}\r\n\r\n.time-picker-outer {\r\n\tdisplay: -webkit-box;\r\n\tdisplay: -ms-flexbox;\r\n\tdisplay: -webkit-flex;\r\n\tdisplay: flex;\r\n\twidth: 100%;\r\n}\r\n.time-item {\r\n\t-webkit-box-flex: 1;\r\n\tflex: 1;\r\n\theight: 30rem;\r\n\tbackground: #ccc;\r\n\ttext-align: center;\r\n}", ""]);
+	exports.push([module.id, "@charset \"utf-8\";\r\n\r\nhtml, body, div, p, a, span {\r\n\tmargin: 0;\r\n\tpadding: 0;\r\n}\r\nhtml, body {\r\n\theight: 100%;\r\n}\r\n\r\n.time-picker-outer {\r\n\tdisplay: -webkit-box;\r\n\tdisplay: -ms-flexbox;\r\n\tdisplay: -webkit-flex;\r\n\tdisplay: flex;\r\n\twidth: 100%;\r\n}\r\n.time-item {\r\n\t-webkit-box-flex: 1;\r\n\tflex: 1;\r\n\theight: 3rem;\r\n\tbackground: #ccc;\r\n\ttext-align: center;\r\n}", ""]);
 
 	// exports
 
