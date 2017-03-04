@@ -79,7 +79,7 @@
 	'use strict';
 
 	Object.defineProperty(exports, "__esModule", {
-	  value: true
+	    value: true
 	});
 
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -102,181 +102,194 @@
 	var winHeight = window.innerHeight;
 
 	var TimePicker = function (_Component) {
-	  _inherits(TimePicker, _Component);
+	    _inherits(TimePicker, _Component);
 
-	  function TimePicker(props) {
-	    _classCallCheck(this, TimePicker);
+	    function TimePicker(props) {
+	        _classCallCheck(this, TimePicker);
 
-	    var _this = _possibleConstructorReturn(this, (TimePicker.__proto__ || Object.getPrototypeOf(TimePicker)).call(this, props));
+	        var _this = _possibleConstructorReturn(this, (TimePicker.__proto__ || Object.getPrototypeOf(TimePicker)).call(this, props));
 
-	    _this.state = {
-	      evtStartX: 0,
-	      evtStartY: 0,
-	      touching: false,
-	      objTranslate: {
-	        x: 0,
-	        y: 0
-	      },
-	      objBounding: {
-	        left: 0,
-	        right: 0,
-	        top: 0,
-	        bottom: 0,
-	        width: 0,
-	        height: 0
-	      },
-	      desX: 0, //move过程中的transform-x的值
-	      desY: 0, //move过程中的transform-y的值
+	        _this.state = {
+	            touchStartY: 0,
+	            touchStartTime: 0,
+	            touchMoveY: 0, //记录每一帧touchMove的y坐标
+	            touchEndTime: 0, //记录touchend的时间戳
 
-	      touchMoveX: 0, //记录每一帧touchMove的X坐标
-	      touchMoveY: 0, //记录每一帧touchMove的y坐标
-	      touchMoveTime: 0, //记录每一帧的时间戳
+	            touchMoveTime: 0, //每帧touchMove事件的时间戳
 
-	      touchEndX: 0, //记录touchend的X坐标
-	      touchEndY: 0, //记录touchend的Y坐标
-	      touchEndTime: 0 };
-	    return _this;
-	  }
-
-	  _createClass(TimePicker, [{
-	    key: 'componentWillMount',
-	    value: function componentWillMount() {}
-	  }, {
-	    key: 'componentDidMount',
-	    value: function componentDidMount() {
-	      var ele = document.querySelectorAll('.time-item')[1];
-	      this.moveElement(ele, 0, 0);
-	      var that = this;
-
-	      ele.addEventListener('touchstart', function (event) {
-	        var evt = event.touches[0] || event;
-	        var rect = ele.getBoundingClientRect();
-	        that.setState({
-	          evtStartX: evt.pageX,
-	          evtStartY: evt.pageY,
-	          touching: true,
-	          objBounding: {
-	            left: rect.left,
-	            right: rect.right,
-	            top: rect.top,
-	            bottom: rect.bottom,
-	            width: rect.width,
-	            height: rect.height
-	          }
-	        });
-	      });
-
-	      document.addEventListener('touchmove', function (event) {
-	        if (!that.state.touching) {
-	          return;
-	        }
-	        event.preventDefault();
-	        var evt = event.touches[0] || event;
-	        that.setState({
-	          touchMoveX: evt.pageX,
-	          touchMoveY: evt.pageY,
-	          touchMoveTime: +new Date()
-	        });
-	        //var moveX = evt.pageX - that.state.evtStartX;
-	        var moveY = evt.pageY - that.state.evtStartY;
-
-	        //var desLeft = that.state.objBounding.left + moveX;
-	        //var desRight = that.state.objBounding.right + moveX;
-	        var desTop = that.state.objBounding.top + moveY;
-	        var desBottom = that.state.objBounding.bottom + moveY;
-	        // if(desLeft < 0) {
-	        // 	moveX = -that.state.objBounding.left;
-	        // }
-	        // if(desRight > winWidth) {
-	        // 	moveX = winWidth - that.state.objBounding.right;
-	        // }
-	        if (desTop < 0) {
-	          moveY = -that.state.objBounding.top;
-	        }
-	        if (desBottom > winHeight) {
-	          moveY = winHeight - that.state.objBounding.bottom;
-	        }
-
-	        //var desX = that.state.objTranslate.x + moveX;
-	        var desY = that.state.objTranslate.y + moveY;
-	        that.moveElement(ele, 0, desY);
-	      });
-
-	      document.addEventListener('touchend', function (event) {
-	        var evt = event.touches[0] || event;
-	        that.setState({
-	          touching: false,
-	          objTranslate: {
-	            //x: that.state.desX,
-	            y: that.state.desY
-	          },
-	          //touchEndX: evt.pageX,
-	          touchEndY: evt.pageY,
-	          touchEndTime: +new Date()
-	        });
-
-	        var moveY = that.state.touchEndY - that.state.touchMoveY;
-	        var moveX = that.state.touchEndX - that.state.touchMoveX;
-	        var dis = moveY;
-	        var time = that.state.touchEndTime - that.state.touchMoveTime;
-	        var speed = dis / time * 16.66;
-	      });
+	            touching: false,
+	            objTranslate: {
+	                y: 0
+	            },
+	            objBounding: {
+	                left: 0,
+	                right: 0,
+	                top: 0,
+	                bottom: 0,
+	                width: 0,
+	                height: 0
+	            },
+	            desY: 0, //move过程中的transform-y的值
+	            inertia: false };
+	        return _this;
 	    }
-	  }, {
-	    key: 'componentDidUpdate',
-	    value: function componentDidUpdate() {}
-	  }, {
-	    key: 'componentWillUnmount',
-	    value: function componentWillUnmount() {}
-	  }, {
-	    key: 'moveElement',
-	    value: function moveElement(ele, x, y) {
-	      var x = Math.round(1000 * x) / 1000;
-	      var y = Math.round(1000 * y) / 1000;
 
-	      ele.style.webkitTransform = 'translate(' + x + 'px,' + y + 'px)';
-	      ele.style.transform = 'translate3d(' + x + 'px,' + y + 'px, 0)';
-	      this.setState({
-	        desX: x,
-	        desY: y
-	      });
-	    }
-	  }, {
-	    key: 'render',
-	    value: function render() {
-	      return _react2.default.createElement(
-	        'div',
-	        { className: 'time-picker-outer' },
-	        _react2.default.createElement(
-	          'div',
-	          { className: 'time-item' },
-	          '1'
-	        ),
-	        _react2.default.createElement(
-	          'div',
-	          { className: 'time-item' },
-	          '2'
-	        ),
-	        _react2.default.createElement(
-	          'div',
-	          { className: 'time-item' },
-	          '3'
-	        ),
-	        _react2.default.createElement(
-	          'div',
-	          { className: 'time-item' },
-	          '4'
-	        ),
-	        _react2.default.createElement(
-	          'div',
-	          { className: 'time-item' },
-	          '5'
-	        )
-	      );
-	    }
-	  }]);
+	    _createClass(TimePicker, [{
+	        key: 'componentDidMount',
+	        value: function componentDidMount() {
+	            var ele = document.querySelectorAll('.time-item')[1];
+	            this.moveElement(ele, 0, 0);
+	            var that = this;
 
-	  return TimePicker;
+	            ele.addEventListener('touchstart', function (event) {
+	                var evt = event.touches[0] || event;
+	                var rect = ele.getBoundingClientRect();
+	                that.setState({
+	                    touchStartY: evt.pageY,
+	                    touchStartTime: +new Date(),
+	                    touching: true,
+	                    objBounding: {
+	                        left: rect.left,
+	                        right: rect.right,
+	                        top: rect.top,
+	                        bottom: rect.bottom,
+	                        width: rect.width,
+	                        height: rect.height
+	                    }
+	                });
+	            });
+
+	            document.addEventListener('touchmove', function (event) {
+	                if (!that.state.touching) {
+	                    return;
+	                }
+
+	                event.preventDefault();
+	                var evt = event.touches[0] || event;
+	                that.setState({
+	                    touchMoveY: evt.pageY,
+	                    touchMoveTime: +new Date()
+	                });
+
+	                var moveY = evt.pageY - that.state.touchStartY;
+
+	                var desTop = that.state.objBounding.top + moveY;
+	                var desBottom = that.state.objBounding.bottom + moveY;
+
+	                if (desTop < 0) {
+	                    moveY = -that.state.objBounding.top;
+	                }
+	                if (desBottom > winHeight) {
+	                    moveY = winHeight - that.state.objBounding.bottom;
+	                }
+
+	                var desY = that.state.objTranslate.y + moveY;
+	                that.moveElement(ele, 0, desY);
+	            });
+
+	            document.addEventListener('touchend', function (event) {
+	                var evt = event.touches[0] || event;
+
+	                that.setState({
+	                    touching: false,
+	                    objTranslate: {
+	                        y: that.state.desY
+	                    },
+	                    touchEndTime: +new Date(),
+	                    inertia: true
+	                });
+	                //最后一次touchMoveTime和touchEndTime之间超过30ms,意味着停留了长时间,不做滑动
+	                if (that.state.touchEndTime - that.state.touchMoveTime > 30) {
+	                    return;
+	                }
+	                var moveY = that.state.touchMoveY - that.state.touchStartY; //矢量有+-
+	                var time = that.state.touchEndTime - that.state.touchStartTime;
+	                var speed = moveY / time * 16.666; //矢量有+-
+	                var rate = Math.min(10, Math.abs(speed)); //加速度a
+
+	                var slide = function slide() {
+	                    if (that.state.touching) {
+	                        that.setState({
+	                            inertia: false
+	                        });
+	                        return;
+	                    }
+	                    if (!that.state.inertia) {
+	                        return;
+	                    }
+	                    speed = speed - speed / rate;
+
+	                    var y = that.state.objTranslate.y + speed;
+
+	                    that.moveElement(ele, 0, y);
+	                    that.setState({
+	                        objTranslate: {
+	                            y: y
+	                        }
+	                    });
+
+	                    if (Math.abs(speed) < 0.1) {
+	                        speed = 0;
+	                        that.setState({
+	                            inertia: false
+	                        });
+	                    } else {
+	                        requestAnimationFrame(slide);
+	                    }
+	                };
+
+	                slide();
+	            });
+	        }
+	    }, {
+	        key: 'moveElement',
+	        value: function moveElement(ele, x, y) {
+	            var x = Math.round(1000 * x) / 1000;
+	            var y = Math.round(1000 * y) / 1000;
+
+	            ele.style.webkitTransform = 'translate(' + x + 'px,' + y + 'px)';
+	            ele.style.transform = 'translate3d(' + x + 'px,' + y + 'px, 0)';
+	            this.setState({
+	                desX: x,
+	                desY: y
+	            });
+	        }
+	    }, {
+	        key: 'render',
+	        value: function render() {
+	            return _react2.default.createElement(
+	                'div',
+	                { className: 'time-picker-outer' },
+	                _react2.default.createElement(
+	                    'div',
+	                    { className: 'time-item' },
+	                    '1'
+	                ),
+	                _react2.default.createElement(
+	                    'div',
+	                    { className: 'time-item' },
+	                    '2'
+	                ),
+	                _react2.default.createElement(
+	                    'div',
+	                    { className: 'time-item' },
+	                    '3'
+	                ),
+	                _react2.default.createElement(
+	                    'div',
+	                    { className: 'time-item' },
+	                    '4'
+	                ),
+	                _react2.default.createElement(
+	                    'div',
+	                    { className: 'time-item' },
+	                    '5'
+	                )
+	            );
+	        }
+	    }]);
+
+	    return TimePicker;
 	}(_react.Component);
 
 	exports.default = TimePicker;
