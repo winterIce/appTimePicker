@@ -44,43 +44,53 @@ export default class TimePicker extends Component {
             moveYHour: 0,
             moveYMinute: 0,
 
-            year: 2013,
-            month: 4,
-            date: 4,
-            hour: 3,
-            minute: 3,
+            year: 0,
+            month: 0,
+            date: 0,
+            hour: 0,
+            minute: 0,
 		};
 	}
     init() {
         var years = [];
         for(var i = 2010; i <= 2020; i++) {
-            years.push('<div class="time-item-content">'+i+'</div>');
+            years.push('<div class="time-item-content">' + i + '</div>');
         }
         this.refs.yearItem.innerHTML = years.join('');
 
         var months = [];
         for(i = 1; i <= 12; i++) {
-            months.push('<div class="time-item-content">' + i + '</div>');
+            months.push('<div class="time-item-content">' + this.addZero(i) + '</div>');
         }
         this.refs.monthItem.innerHTML = months.join('');
 
         var dates = [];
         for(i = 1; i <= 31; i++) {
-            dates.push('<div class="time-item-content">' + i + '</div>');
+            dates.push('<div class="time-item-content">' + this.addZero(i) + '</div>');
         }
         this.refs.dateItem.innerHTML = dates.join('');
 
         var hours = [];
         for(i = 0; i <= 23; i++) {
-            hours.push('<div class="time-item-content">' + i + '</div>');
+            hours.push('<div class="time-item-content">' + this.addZero(i) + '</div>');
         }
         this.refs.hourItem.innerHTML = hours.join('');
 
         var minutes = [];
         for(i = 0; i <= 59; i++) {
-            minutes.push('<div class="time-item-content">' + i + '</div>');
+            minutes.push('<div class="time-item-content">' + this.addZero(i) + '</div>');
         }
         this.refs.minuteItem.innerHTML = minutes.join('');
+    }
+    componentWillMount() {
+        var d = new Date();
+        this.setState({
+            year: d.getFullYear(),
+            month: d.getMonth() + 1,
+            date: d.getDate(),
+            hour: d.getHours(),
+            minute: d.getMinutes(),
+        });
     }
 	componentDidMount() {
         var that = this;
@@ -93,7 +103,23 @@ export default class TimePicker extends Component {
         eleArr.push(that.refs.minuteItemMask);
         eleArr.forEach(function(item) {
             var itemContent = item.nextSibling.nextSibling;
-            that.moveElement(itemContent, 0, 0);
+            var type = itemContent.getAttribute('data-type');
+            if(type == 'year') {
+                that.moveElement(itemContent, 0, 34 * (2013 - that.state.year));    
+            }
+            else if(type == 'month') {
+                that.moveElement(itemContent, 0, 34 * (4 - that.state.month));   
+            }
+            else if(type == 'date') {
+                that.moveElement(itemContent, 0, 34 * (4 - that.state.date));   
+            }
+            else if(type == 'hour') {
+                that.moveElement(itemContent, 0, 34 * (3 - that.state.hour));   
+            }
+            else if(type == 'minute') {
+                that.moveElement(itemContent, 0, 34 * (3 - that.state.minute));   
+            }
+
             item.addEventListener('touchstart', function(event) {
                 var item = itemContent;
                 var evt = event.touches[0] || event;
@@ -152,6 +178,9 @@ export default class TimePicker extends Component {
         });
         
         document.addEventListener('touchend', function(event) {
+            if(!that.state.touching) {
+                return;
+            }
             var evt = event.touches[0] || event;
             
             that.setState({
@@ -296,7 +325,7 @@ export default class TimePicker extends Component {
                 minute: 3 - y / itemHeight,
             });
         }
-        console.log(this.state.year + '-' + this.state.month + '-' + this.state.date + ' ' + this.state.hour + ':' +this.state.minute + ':' + '00');
+        console.log(this.state.year + '-' + this.addZero(this.state.month) + '-' + this.addZero(this.state.date) + ' ' + this.addZero(this.state.hour) + ':' + this.addZero(this.state.minute) + ':' + '00');
     }
 	moveElement(ele, x, y) {
         var x = Math.round(1000 * x) / 1000;
@@ -317,6 +346,12 @@ export default class TimePicker extends Component {
     **/
     easeOutQuad(t, b, c, d) {
         return -c *(t /= d)*(t-2) + b;
+    }
+    addZero(n) {
+        if(n < 10) {
+            return '0' + n;
+        }
+        return n;
     }
 
 	render() {
