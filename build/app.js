@@ -129,7 +129,15 @@
 	                width: 0,
 	                height: 0
 	            },
-	            desY: 0, //move过程中的transform-y的值
+	            containerBounding: {
+	                left: 0,
+	                right: 0,
+	                top: 0,
+	                bottom: 0,
+	                width: 0,
+	                height: 0
+	            },
+	            moveY: 0, //move过程中的transform-y的值
 	            inertia: false };
 	        return _this;
 	    }
@@ -139,6 +147,19 @@
 	        value: function componentDidMount() {
 	            var ele = document.querySelectorAll('.time-item')[1];
 	            this.moveElement(ele, 0, 0);
+
+	            var container = document.querySelectorAll('.time-picker-outer')[0];
+	            var containerRect = container.getBoundingClientRect();
+	            this.setState({
+	                containerBounding: {
+	                    left: containerRect.left,
+	                    right: containerRect.right,
+	                    top: containerRect.top,
+	                    bottom: containerRect.bottom,
+	                    width: containerRect.width,
+	                    height: containerRect.height
+	                }
+	            });
 	            var that = this;
 
 	            ele.addEventListener('touchstart', function (event) {
@@ -176,15 +197,15 @@
 	                var desTop = that.state.objBounding.top + moveY;
 	                var desBottom = that.state.objBounding.bottom + moveY;
 
-	                if (desTop < 0) {
-	                    moveY = -that.state.objBounding.top;
+	                if (desTop < that.state.containerBounding.top - that.state.objBounding.height) {
+	                    moveY = that.state.containerBounding.top - that.state.objBounding.height - that.state.objBounding.top;
 	                }
-	                if (desBottom > winHeight) {
-	                    moveY = winHeight - that.state.objBounding.bottom;
+	                if (desBottom > that.state.containerBounding.bottom + that.state.objBounding.height) {
+	                    moveY = that.state.containerBounding.bottom + that.state.objBounding.height - that.state.objBounding.bottom;
 	                }
 
-	                var desY = that.state.objTranslate.y + moveY;
-	                that.moveElement(ele, 0, desY);
+	                var tempY = that.state.objTranslate.y + moveY;
+	                that.moveElement(ele, 0, tempY);
 	            });
 
 	            document.addEventListener('touchend', function (event) {
@@ -193,11 +214,12 @@
 	                that.setState({
 	                    touching: false,
 	                    objTranslate: {
-	                        y: that.state.desY
+	                        y: that.state.moveY
 	                    },
 	                    touchEndTime: +new Date(),
 	                    inertia: true
 	                });
+	                that.inBox(ele);
 	                //最后一次touchMoveTime和touchEndTime之间超过30ms,意味着停留了长时间,不做滑动
 	                if (that.state.touchEndTime - that.state.touchMoveTime > 30) {
 	                    return;
@@ -228,11 +250,12 @@
 	                        }
 	                    });
 
-	                    if (Math.abs(speed) < 0.1) {
+	                    if (Math.abs(speed) < 0.5) {
 	                        speed = 0;
 	                        that.setState({
 	                            inertia: false
 	                        });
+	                        that.inBox(ele);
 	                    } else {
 	                        requestAnimationFrame(slide);
 	                    }
@@ -240,6 +263,54 @@
 
 	                slide();
 	            });
+	        }
+	    }, {
+	        key: 'inBox',
+	        value: function inBox(ele) {
+	            var that = this;
+	            var maxY = that.state.objBounding.height / 2;
+	            var minY = -maxY;
+	            var moveY;
+	            if (that.state.objTranslate.y > maxY) {
+	                moveY = maxY - that.state.objTranslate.y;
+	            } else if (that.state.objTranslate.y < minY) {
+	                moveY = minY - that.state.objTranslate.y;
+	            } else {
+	                return;
+	            }
+
+	            var start = 0;
+	            var during = 40;
+	            var init = that.state.objTranslate.y;
+
+	            var run = function run() {
+	                // 如果用户触摸元素，停止滑动
+	                if (that.state.touching) {
+	                    that.setState({
+	                        objTranslate: {
+	                            y: that.state.moveY
+	                        },
+	                        inertia: false
+	                    });
+	                    return;
+	                }
+
+	                start++;
+	                var y = that.easeOutQuad(start, init, moveY, during);
+	                that.moveElement(ele, 0, y);
+
+	                if (start < during) {
+	                    requestAnimationFrame(run);
+	                } else {
+	                    that.setState({
+	                        objTranslate: {
+	                            y: y
+	                        },
+	                        inertia: false
+	                    });
+	                }
+	            };
+	            run();
 	        }
 	    }, {
 	        key: 'moveElement',
@@ -251,8 +322,21 @@
 	            ele.style.transform = 'translate3d(' + x + 'px,' + y + 'px, 0)';
 	            this.setState({
 	                desX: x,
-	                desY: y
+	                moveY: y
 	            });
+	        }
+	        // easeOutQuad算法,先慢后快
+	        /*
+	         * t: current time(当前时间)
+	         * b: beginning value(初始值)
+	         * c: change in value(变化量)
+	         * d: duration(持续时间)
+	        **/
+
+	    }, {
+	        key: 'easeOutQuad',
+	        value: function easeOutQuad(t, b, c, d) {
+	            return -c * (t /= d) * (t - 2) + b;
 	        }
 	    }, {
 	        key: 'render',
@@ -329,7 +413,7 @@
 
 
 	// module
-	exports.push([module.id, "@charset \"utf-8\";\r\n\r\nhtml, body, div, p, a, span {\r\n\tmargin: 0;\r\n\tpadding: 0;\r\n}\r\nhtml, body {\r\n\theight: 100%;\r\n}\r\n\r\n.time-picker-outer {\r\n\tdisplay: -webkit-box;\r\n\tdisplay: -ms-flexbox;\r\n\tdisplay: -webkit-flex;\r\n\tdisplay: flex;\r\n\twidth: 100%;\r\n}\r\n.time-item {\r\n\t-webkit-box-flex: 1;\r\n\tflex: 1;\r\n\theight: 3rem;\r\n\tbackground: #ccc;\r\n\ttext-align: center;\r\n}", ""]);
+	exports.push([module.id, "@charset \"utf-8\";\r\n\r\nhtml, body, div, p, a, span {\r\n\tmargin: 0;\r\n\tpadding: 0;\r\n}\r\nhtml, body {\r\n\theight: 100%;\r\n}\r\n\r\n.time-picker-outer {\r\n\tdisplay: -webkit-box;\r\n\tdisplay: -ms-flexbox;\r\n\tdisplay: -webkit-flex;\r\n\tdisplay: flex;\r\n\twidth: 100%;\r\n\tposition: fixed;\r\n\ttop: 200px;\r\n}\r\n.time-item {\r\n\t-webkit-box-flex: 1;\r\n\tflex: 1;\r\n\theight: 6rem;\r\n\tbackground: #ccc;\r\n\ttext-align: center;\r\n}", ""]);
 
 	// exports
 

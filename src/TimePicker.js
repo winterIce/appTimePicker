@@ -19,20 +19,41 @@ export default class TimePicker extends Component {
             	y: 0,
             },
             objBounding: {
-            	left: 0 ,
+            	left: 0,
             	right: 0,
             	top: 0,
             	bottom: 0,
             	width: 0,
             	height: 0,
             },
-            desY: 0, //move过程中的transform-y的值
+            containerBounding: {
+                left: 0,
+                right: 0,
+                top: 0,
+                bottom: 0,
+                width: 0,
+                height: 0,
+            },
+            moveY: 0, //move过程中的transform-y的值
             inertia: false,//是否处于惯性状态
 		};
 	}
 	componentDidMount() {
         var ele = document.querySelectorAll('.time-item')[1];
         this.moveElement(ele, 0, 0);
+
+        var container = document.querySelectorAll('.time-picker-outer')[0];
+        var containerRect = container.getBoundingClientRect();
+        this.setState({
+            containerBounding: {
+                left: containerRect.left,
+                right: containerRect.right,
+                top: containerRect.top,
+                bottom: containerRect.bottom,
+                width: containerRect.width,
+                height: containerRect.height,
+            }
+        });
         var that = this;
         
         ele.addEventListener('touchstart', function(event) {
@@ -70,15 +91,15 @@ export default class TimePicker extends Component {
             var desTop = that.state.objBounding.top + moveY;
             var desBottom = that.state.objBounding.bottom + moveY;
             
-            if(desTop < 0) {
-            	moveY = -that.state.objBounding.top;
+            if(desTop < that.state.containerBounding.top - that.state.objBounding.height) {
+                moveY = that.state.containerBounding.top - that.state.objBounding.height - that.state.objBounding.top;
             }
-            if(desBottom > winHeight) {
-            	moveY = winHeight - that.state.objBounding.bottom;
+            if(desBottom > that.state.containerBounding.bottom + that.state.objBounding.height) {
+                moveY = that.state.containerBounding.bottom + that.state.objBounding.height - that.state.objBounding.bottom;
             }
 
-            var desY = that.state.objTranslate.y + moveY;
-            that.moveElement(ele, 0, desY);
+            var tempY = that.state.objTranslate.y + moveY;
+            that.moveElement(ele, 0, tempY);
         });
         
         document.addEventListener('touchend', function(event) {
@@ -87,11 +108,12 @@ export default class TimePicker extends Component {
             that.setState({
         	    touching: false,
             	objTranslate: {
-                    y: that.state.desY,
+                    y: that.state.moveY,
                 },
                 touchEndTime: +new Date(),
                 inertia: true,
             });
+            that.inBox(ele);
             //最后一次touchMoveTime和touchEndTime之间超过30ms,意味着停留了长时间,不做滑动
             if(that.state.touchEndTime - that.state.touchMoveTime > 30) {
                 return;
@@ -122,11 +144,12 @@ export default class TimePicker extends Component {
                     }
                 });
 
-                if (Math.abs(speed) < 0.1) {
+                if (Math.abs(speed) < 0.5) {
                     speed = 0;
                     that.setState({
                         inertia: false,
                     });
+                    that.inBox(ele);
                 } else {
                     requestAnimationFrame(slide);
                 }
@@ -135,6 +158,54 @@ export default class TimePicker extends Component {
             slide();
         });
 	}
+    inBox(ele) {
+        var that = this;
+        var maxY = that.state.objBounding.height / 2;
+        var minY = -maxY;
+        var moveY;
+        if(that.state.objTranslate.y > maxY) {
+            moveY = maxY - that.state.objTranslate.y;
+        }
+        else if(that.state.objTranslate.y < minY) {
+            moveY = minY - that.state.objTranslate.y;   
+        }
+        else {
+            return;
+        }
+        
+        var start = 0;
+        var during = 40;
+        var init = that.state.objTranslate.y;
+
+        var run = function () {
+            // 如果用户触摸元素，停止滑动
+            if (that.state.touching) {
+                that.setState({
+                    objTranslate: {
+                        y: that.state.moveY,
+                    },
+                    inertia: false,
+                });
+                return;
+            }
+
+            start++;
+            var y = that.easeOutQuad(start, init, moveY, during);
+            that.moveElement(ele, 0, y);
+
+            if (start < during) {
+                requestAnimationFrame(run);
+            } else {
+                that.setState({
+                    objTranslate:{
+                        y: y
+                    },
+                    inertia: false,
+                });
+            }
+        };
+        run();
+    }
 	moveElement(ele, x, y) {
         var x = Math.round(1000 * x) / 1000;
         var y = Math.round(1000 * y) / 1000;
@@ -143,9 +214,19 @@ export default class TimePicker extends Component {
         ele.style.transform = 'translate3d(' + x + 'px,' + y + 'px, 0)';
         this.setState({
         	desX: x,
-        	desY: y,
+        	moveY: y,
         });
 	}
+    // easeOutQuad算法,先慢后快
+    /*
+     * t: current time(当前时间)
+     * b: beginning value(初始值)
+     * c: change in value(变化量)
+     * d: duration(持续时间)
+    **/
+    easeOutQuad(t, b, c, d) {
+        return -c *(t /= d)*(t-2) + b;
+    }
 
 	render() {
 		return(
