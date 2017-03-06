@@ -111,6 +111,7 @@
 	        var _this = _possibleConstructorReturn(this, (TimePicker.__proto__ || Object.getPrototypeOf(TimePicker)).call(this, props));
 
 	        _this.state = {
+	            curItem: null,
 	            touchStartY: 0,
 	            touchStartTime: 0,
 	            touchMoveY: 0, //记录每一帧touchMove的y坐标
@@ -139,7 +140,19 @@
 	                height: 0
 	            },
 	            moveY: 0, //move过程中的transform-y的值
-	            inertia: false };
+	            inertia: false, //是否处于惯性状态
+	            moveYYear: 0,
+	            moveYMonth: 0,
+	            moveYDate: 0,
+	            moveYHour: 0,
+	            moveYMinute: 0,
+
+	            year: 2013,
+	            month: 4,
+	            date: 4,
+	            hour: 3,
+	            minute: 3
+	        };
 	        return _this;
 	    }
 
@@ -147,7 +160,7 @@
 	        key: 'init',
 	        value: function init() {
 	            var years = [];
-	            for (var i = 2000; i <= 2030; i++) {
+	            for (var i = 2010; i <= 2020; i++) {
 	                years.push('<div class="time-item-content">' + i + '</div>');
 	            }
 	            this.refs.yearItem.innerHTML = years.join('');
@@ -179,39 +192,47 @@
 	    }, {
 	        key: 'componentDidMount',
 	        value: function componentDidMount() {
-	            this.init();
-	            var ele = this.refs.yearItem;
-	            this.moveElement(ele, 0, 0);
-
-	            var container = ele.parentNode;
-	            var containerRect = container.getBoundingClientRect();
-	            this.setState({
-	                containerBounding: {
-	                    left: containerRect.left,
-	                    right: containerRect.right,
-	                    top: containerRect.top,
-	                    bottom: containerRect.bottom,
-	                    width: containerRect.width,
-	                    height: containerRect.height
-	                }
-	            });
 	            var that = this;
+	            that.init();
+	            var eleArr = [];
+	            eleArr.push(that.refs.yearItemMask);
+	            eleArr.push(that.refs.monthItemMask);
+	            eleArr.push(that.refs.dateItemMask);
+	            eleArr.push(that.refs.hourItemMask);
+	            eleArr.push(that.refs.minuteItemMask);
+	            eleArr.forEach(function (item) {
+	                var itemContent = item.nextSibling.nextSibling;
+	                that.moveElement(itemContent, 0, 0);
+	                item.addEventListener('touchstart', function (event) {
+	                    var item = itemContent;
+	                    var evt = event.touches[0] || event;
+	                    var rect = item.getBoundingClientRect();
 
-	            ele.addEventListener('touchstart', function (event) {
-	                var evt = event.touches[0] || event;
-	                var rect = ele.getBoundingClientRect();
-	                that.setState({
-	                    touchStartY: evt.pageY,
-	                    touchStartTime: +new Date(),
-	                    touching: true,
-	                    objBounding: {
-	                        left: rect.left,
-	                        right: rect.right,
-	                        top: rect.top,
-	                        bottom: rect.bottom,
-	                        width: rect.width,
-	                        height: rect.height
-	                    }
+	                    var container = item.parentNode;
+	                    var containerRect = container.getBoundingClientRect();
+
+	                    that.setState({
+	                        curItem: item,
+	                        touchStartY: evt.pageY,
+	                        touchStartTime: +new Date(),
+	                        touching: true,
+	                        objBounding: {
+	                            left: rect.left,
+	                            right: rect.right,
+	                            top: rect.top,
+	                            bottom: rect.bottom,
+	                            width: rect.width,
+	                            height: rect.height
+	                        },
+	                        containerBounding: {
+	                            left: containerRect.left,
+	                            right: containerRect.right,
+	                            top: containerRect.top,
+	                            bottom: containerRect.bottom,
+	                            width: containerRect.width,
+	                            height: containerRect.height
+	                        }
+	                    });
 	                });
 	            });
 
@@ -236,7 +257,7 @@
 	                if (tempY < -(that.state.objBounding.height - itemHeight)) {
 	                    tempY = -(that.state.objBounding.height - itemHeight);
 	                }
-	                that.moveElement(ele, 0, tempY);
+	                that.moveElement(that.state.curItem, 0, tempY);
 	            });
 
 	            document.addEventListener('touchend', function (event) {
@@ -250,7 +271,7 @@
 	                    touchEndTime: +new Date(),
 	                    inertia: true
 	                });
-	                that.inBox(ele);
+	                that.inBox(that.state.curItem);
 	                //最后一次touchMoveTime和touchEndTime之间超过30ms,意味着停留了长时间,不做滑动
 	                if (that.state.touchEndTime - that.state.touchMoveTime > 30) {
 	                    return;
@@ -274,7 +295,7 @@
 
 	                    var y = that.state.objTranslate.y + speed;
 
-	                    that.moveElement(ele, 0, y);
+	                    that.moveElement(that.state.curItem, 0, y);
 	                    that.setState({
 	                        objTranslate: {
 	                            y: y
@@ -286,7 +307,7 @@
 	                        that.setState({
 	                            inertia: false
 	                        });
-	                        that.inBox(ele);
+	                        that.inBox(that.state.curItem);
 	                    } else {
 	                        requestAnimationFrame(slide);
 	                    }
@@ -301,7 +322,7 @@
 	            var that = this;
 	            var maxY = 3 * itemHeight;
 	            var minY = -(that.state.objBounding.height - 4 * itemHeight);
-	            var moveY;
+	            var moveY; //delta变化量
 	            if (that.state.objTranslate.y > maxY) {
 	                moveY = maxY - that.state.objTranslate.y;
 	            } else if (that.state.objTranslate.y < minY) {
@@ -314,6 +335,14 @@
 	            var start = 0;
 	            var during = 40;
 	            var init = that.state.objTranslate.y;
+	            //变化量为0,不用动
+	            if (moveY == 0) {
+	                that.setState({
+	                    inertia: false
+	                });
+	                that.calTime(init);
+	                return;
+	            }
 
 	            var run = function run() {
 	                if (that.state.touching) {
@@ -339,9 +368,42 @@
 	                        },
 	                        inertia: false
 	                    });
+	                    that.calTime(y);
 	                }
 	            };
 	            run();
+	        }
+	    }, {
+	        key: 'calTime',
+	        value: function calTime(y) {
+	            var type = this.state.curItem.getAttribute('data-type');
+	            if (type == 'year') {
+	                this.setState({
+	                    moveYYear: y,
+	                    year: 2013 - y / itemHeight
+	                });
+	            } else if (type == 'month') {
+	                this.setState({
+	                    moveYMonth: y,
+	                    month: 4 - y / itemHeight
+	                });
+	            } else if (type == 'date') {
+	                this.setState({
+	                    moveYDate: y,
+	                    date: 4 - y / itemHeight
+	                });
+	            } else if (type == 'hour') {
+	                this.setState({
+	                    moveYMonth: y,
+	                    hour: 3 - y / itemHeight
+	                });
+	            } else if (type == 'minute') {
+	                this.setState({
+	                    moveYMonth: y,
+	                    minute: 3 - y / itemHeight
+	                });
+	            }
+	            console.log(this.state.year + '-' + this.state.month + '-' + this.state.date + ' ' + this.state.hour + ':' + this.state.minute + ':' + '00');
 	        }
 	    }, {
 	        key: 'moveElement',
@@ -380,9 +442,9 @@
 	                    _react2.default.createElement(
 	                        'div',
 	                        { className: 'time-item' },
-	                        _react2.default.createElement('div', { className: 'time-item-mask' }),
+	                        _react2.default.createElement('div', { className: 'time-item-mask', ref: 'yearItemMask' }),
 	                        _react2.default.createElement('div', { className: 'time-item-middle-bg' }),
-	                        _react2.default.createElement('div', { className: 'time-item-contents', ref: 'yearItem' })
+	                        _react2.default.createElement('div', { className: 'time-item-contents', ref: 'yearItem', 'data-type': 'year' })
 	                    )
 	                ),
 	                _react2.default.createElement(
@@ -391,9 +453,9 @@
 	                    _react2.default.createElement(
 	                        'div',
 	                        { className: 'time-item' },
-	                        _react2.default.createElement('div', { className: 'time-item-mask' }),
+	                        _react2.default.createElement('div', { className: 'time-item-mask', ref: 'monthItemMask' }),
 	                        _react2.default.createElement('div', { className: 'time-item-middle-bg' }),
-	                        _react2.default.createElement('div', { className: 'time-item-contents', ref: 'monthItem' })
+	                        _react2.default.createElement('div', { className: 'time-item-contents', ref: 'monthItem', 'data-type': 'month' })
 	                    )
 	                ),
 	                _react2.default.createElement(
@@ -402,9 +464,9 @@
 	                    _react2.default.createElement(
 	                        'div',
 	                        { className: 'time-item' },
-	                        _react2.default.createElement('div', { className: 'time-item-mask' }),
+	                        _react2.default.createElement('div', { className: 'time-item-mask', ref: 'dateItemMask' }),
 	                        _react2.default.createElement('div', { className: 'time-item-middle-bg' }),
-	                        _react2.default.createElement('div', { className: 'time-item-contents', ref: 'dateItem' })
+	                        _react2.default.createElement('div', { className: 'time-item-contents', ref: 'dateItem', 'data-type': 'date' })
 	                    )
 	                ),
 	                _react2.default.createElement(
@@ -413,9 +475,9 @@
 	                    _react2.default.createElement(
 	                        'div',
 	                        { className: 'time-item' },
-	                        _react2.default.createElement('div', { className: 'time-item-mask' }),
+	                        _react2.default.createElement('div', { className: 'time-item-mask', ref: 'hourItemMask' }),
 	                        _react2.default.createElement('div', { className: 'time-item-middle-bg' }),
-	                        _react2.default.createElement('div', { className: 'time-item-contents', ref: 'hourItem' })
+	                        _react2.default.createElement('div', { className: 'time-item-contents', ref: 'hourItem', 'data-type': 'hour' })
 	                    )
 	                ),
 	                _react2.default.createElement(
@@ -424,9 +486,9 @@
 	                    _react2.default.createElement(
 	                        'div',
 	                        { className: 'time-item' },
-	                        _react2.default.createElement('div', { className: 'time-item-mask' }),
+	                        _react2.default.createElement('div', { className: 'time-item-mask', ref: 'minuteItemMask' }),
 	                        _react2.default.createElement('div', { className: 'time-item-middle-bg' }),
-	                        _react2.default.createElement('div', { className: 'time-item-contents', ref: 'minuteItem' })
+	                        _react2.default.createElement('div', { className: 'time-item-contents', ref: 'minuteItem', 'data-type': 'minute' })
 	                    )
 	                )
 	            );
@@ -473,7 +535,7 @@
 
 
 	// module
-	exports.push([module.id, "@charset \"utf-8\";\r\n\r\nhtml, body, div, p, a, span {\r\n\tmargin: 0;\r\n\tpadding: 0;\r\n}\r\nhtml, body {\r\n\theight: 100%;\r\n}\r\n\r\n.time-picker-container {\r\n\tdisplay: -webkit-box;\r\n\tdisplay: -ms-flexbox;\r\n\tdisplay: -webkit-flex;\r\n\tdisplay: flex;\r\n\twidth: 100%;\r\n\tposition: fixed;\r\n\ttop: 200px;\r\n}\r\n.time-item-container {\r\n\t-webkit-box-flex: 1;\r\n\tflex: 1;\r\n\ttext-align: center;\r\n}\r\n.time-item {\r\n\tdisplay: block;\r\n    position: relative;\r\n    overflow: hidden;\r\n    height: 238px;\r\n}\r\n.time-item-mask {\r\n\t/*position: absolute;\r\n    left: 0;\r\n    top: 0;\r\n    right: 0;\r\n    bottom: 0;\r\n    z-index: 3;*/\r\n    /*background-image: -webkit-linear-gradient(top, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.6)), -webkit-linear-gradient(bottom, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.6));\r\n    background-image: linear-gradient(to bottom, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.6)), linear-gradient(to top, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.6));\r\n    background-position: top, bottom;\r\n    background-size: 100% 102px;\r\n    background-repeat: no-repeat;*/\r\n}\r\n.time-item-contents {\r\n\tposition: absolute;\r\n    left: 0;\r\n    top: 0;\r\n    right: 0;\r\n    z-index: 2;\r\n}\r\n.time-item-content {\r\n\ttext-align: center;\r\n    font-size: 16px;\r\n    line-height: 34px;\r\n    height: 34px;\r\n    color: #000;\r\n    white-space: nowrap;\r\n    text-overflow: ellipsis;\r\n    overflow: hidden;\r\n}\r\n.time-item-middle-bg {\r\n\tposition: absolute;\r\n\tz-index: 1;\r\n\ttop: 102px;\r\n\tleft: 0;\r\n\tright: 0;\r\n\theight: 34px;\r\n\tborder-top: 1px solid #d0d0d0;\r\n\tborder-bottom: 1px solid #d0d0d0;\r\n}\r\n", ""]);
+	exports.push([module.id, "@charset \"utf-8\";\r\n\r\nhtml, body, div, p, a, span {\r\n\tmargin: 0;\r\n\tpadding: 0;\r\n}\r\nhtml, body {\r\n\theight: 100%;\r\n}\r\n\r\n.time-picker-container {\r\n\tdisplay: -webkit-box;\r\n\tdisplay: -ms-flexbox;\r\n\tdisplay: -webkit-flex;\r\n\tdisplay: flex;\r\n\twidth: 100%;\r\n\tposition: fixed;\r\n\ttop: 200px;\r\n}\r\n.time-item-container {\r\n\t-webkit-box-flex: 1;\r\n\tflex: 1;\r\n\ttext-align: center;\r\n}\r\n.time-item {\r\n\tdisplay: block;\r\n    position: relative;\r\n    overflow: hidden;\r\n    height: 238px;\r\n}\r\n.time-item-mask {\r\n\tposition: absolute;\r\n    left: 0;\r\n    top: 0;\r\n    right: 0;\r\n    bottom: 0;\r\n    z-index: 3;\r\n    background-image: -webkit-linear-gradient(top, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.6)), -webkit-linear-gradient(bottom, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.6));\r\n    background-image: linear-gradient(to bottom, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.6)), linear-gradient(to top, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.6));\r\n    background-position: top, bottom;\r\n    background-size: 100% 102px;\r\n    background-repeat: no-repeat;\r\n}\r\n.time-item-contents {\r\n\tposition: absolute;\r\n    left: 0;\r\n    top: 0;\r\n    right: 0;\r\n    z-index: 2;\r\n}\r\n.time-item-content {\r\n\ttext-align: center;\r\n    font-size: 16px;\r\n    line-height: 34px;\r\n    height: 34px;\r\n    color: #000;\r\n    white-space: nowrap;\r\n    text-overflow: ellipsis;\r\n    overflow: hidden;\r\n}\r\n.time-item-middle-bg {\r\n\tposition: absolute;\r\n\tz-index: 1;\r\n\ttop: 102px;\r\n\tleft: 0;\r\n\tright: 0;\r\n\theight: 34px;\r\n\tborder-top: 1px solid #d0d0d0;\r\n\tborder-bottom: 1px solid #d0d0d0;\r\n}\r\n", ""]);
 
 	// exports
 
