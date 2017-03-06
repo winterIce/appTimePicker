@@ -100,6 +100,7 @@
 
 	var winWidth = window.innerWidth;
 	var winHeight = window.innerHeight;
+	var itemHeight = 34;
 
 	var TimePicker = function (_Component) {
 	    _inherits(TimePicker, _Component);
@@ -143,12 +144,46 @@
 	    }
 
 	    _createClass(TimePicker, [{
+	        key: 'init',
+	        value: function init() {
+	            var years = [];
+	            for (var i = 2000; i <= 2030; i++) {
+	                years.push('<div class="time-item-content">' + i + '</div>');
+	            }
+	            this.refs.yearItem.innerHTML = years.join('');
+
+	            var months = [];
+	            for (i = 1; i <= 12; i++) {
+	                months.push('<div class="time-item-content">' + i + '</div>');
+	            }
+	            this.refs.monthItem.innerHTML = months.join('');
+
+	            var dates = [];
+	            for (i = 1; i <= 31; i++) {
+	                dates.push('<div class="time-item-content">' + i + '</div>');
+	            }
+	            this.refs.dateItem.innerHTML = dates.join('');
+
+	            var hours = [];
+	            for (i = 0; i <= 23; i++) {
+	                hours.push('<div class="time-item-content">' + i + '</div>');
+	            }
+	            this.refs.hourItem.innerHTML = hours.join('');
+
+	            var minutes = [];
+	            for (i = 0; i <= 59; i++) {
+	                minutes.push('<div class="time-item-content">' + i + '</div>');
+	            }
+	            this.refs.minuteItem.innerHTML = minutes.join('');
+	        }
+	    }, {
 	        key: 'componentDidMount',
 	        value: function componentDidMount() {
-	            var ele = document.querySelectorAll('.time-item')[1];
+	            this.init();
+	            var ele = this.refs.yearItem;
 	            this.moveElement(ele, 0, 0);
 
-	            var container = document.querySelectorAll('.time-picker-outer')[0];
+	            var container = ele.parentNode;
 	            var containerRect = container.getBoundingClientRect();
 	            this.setState({
 	                containerBounding: {
@@ -194,17 +229,13 @@
 
 	                var moveY = evt.pageY - that.state.touchStartY;
 
-	                var desTop = that.state.objBounding.top + moveY;
-	                var desBottom = that.state.objBounding.bottom + moveY;
-
-	                if (desTop < that.state.containerBounding.top - that.state.objBounding.height) {
-	                    moveY = that.state.containerBounding.top - that.state.objBounding.height - that.state.objBounding.top;
-	                }
-	                if (desBottom > that.state.containerBounding.bottom + that.state.objBounding.height) {
-	                    moveY = that.state.containerBounding.bottom + that.state.objBounding.height - that.state.objBounding.bottom;
-	                }
-
 	                var tempY = that.state.objTranslate.y + moveY;
+	                if (tempY > itemHeight * 6) {
+	                    tempY = itemHeight * 6;
+	                }
+	                if (tempY < -(that.state.objBounding.height - itemHeight)) {
+	                    tempY = -(that.state.objBounding.height - itemHeight);
+	                }
 	                that.moveElement(ele, 0, tempY);
 	            });
 
@@ -268,15 +299,16 @@
 	        key: 'inBox',
 	        value: function inBox(ele) {
 	            var that = this;
-	            var maxY = that.state.objBounding.height / 2;
-	            var minY = -maxY;
+	            var maxY = 3 * itemHeight;
+	            var minY = -(that.state.objBounding.height - 4 * itemHeight);
 	            var moveY;
 	            if (that.state.objTranslate.y > maxY) {
 	                moveY = maxY - that.state.objTranslate.y;
 	            } else if (that.state.objTranslate.y < minY) {
 	                moveY = minY - that.state.objTranslate.y;
 	            } else {
-	                return;
+	                //调整位置,使时间块位于中间
+	                moveY = Math.ceil(that.state.objTranslate.y / itemHeight) * itemHeight - that.state.objTranslate.y;
 	            }
 
 	            var start = 0;
@@ -284,7 +316,6 @@
 	            var init = that.state.objTranslate.y;
 
 	            var run = function run() {
-	                // 如果用户触摸元素，停止滑动
 	                if (that.state.touching) {
 	                    that.setState({
 	                        objTranslate: {
@@ -321,7 +352,6 @@
 	            ele.style.webkitTransform = 'translate(' + x + 'px,' + y + 'px)';
 	            ele.style.transform = 'translate3d(' + x + 'px,' + y + 'px, 0)';
 	            this.setState({
-	                desX: x,
 	                moveY: y
 	            });
 	        }
@@ -343,31 +373,61 @@
 	        value: function render() {
 	            return _react2.default.createElement(
 	                'div',
-	                { className: 'time-picker-outer' },
+	                { className: 'time-picker-container' },
 	                _react2.default.createElement(
 	                    'div',
-	                    { className: 'time-item' },
-	                    '1'
+	                    { className: 'time-item-container' },
+	                    _react2.default.createElement(
+	                        'div',
+	                        { className: 'time-item' },
+	                        _react2.default.createElement('div', { className: 'time-item-mask' }),
+	                        _react2.default.createElement('div', { className: 'time-item-middle-bg' }),
+	                        _react2.default.createElement('div', { className: 'time-item-contents', ref: 'yearItem' })
+	                    )
 	                ),
 	                _react2.default.createElement(
 	                    'div',
-	                    { className: 'time-item' },
-	                    '2'
+	                    { className: 'time-item-container' },
+	                    _react2.default.createElement(
+	                        'div',
+	                        { className: 'time-item' },
+	                        _react2.default.createElement('div', { className: 'time-item-mask' }),
+	                        _react2.default.createElement('div', { className: 'time-item-middle-bg' }),
+	                        _react2.default.createElement('div', { className: 'time-item-contents', ref: 'monthItem' })
+	                    )
 	                ),
 	                _react2.default.createElement(
 	                    'div',
-	                    { className: 'time-item' },
-	                    '3'
+	                    { className: 'time-item-container' },
+	                    _react2.default.createElement(
+	                        'div',
+	                        { className: 'time-item' },
+	                        _react2.default.createElement('div', { className: 'time-item-mask' }),
+	                        _react2.default.createElement('div', { className: 'time-item-middle-bg' }),
+	                        _react2.default.createElement('div', { className: 'time-item-contents', ref: 'dateItem' })
+	                    )
 	                ),
 	                _react2.default.createElement(
 	                    'div',
-	                    { className: 'time-item' },
-	                    '4'
+	                    { className: 'time-item-container' },
+	                    _react2.default.createElement(
+	                        'div',
+	                        { className: 'time-item' },
+	                        _react2.default.createElement('div', { className: 'time-item-mask' }),
+	                        _react2.default.createElement('div', { className: 'time-item-middle-bg' }),
+	                        _react2.default.createElement('div', { className: 'time-item-contents', ref: 'hourItem' })
+	                    )
 	                ),
 	                _react2.default.createElement(
 	                    'div',
-	                    { className: 'time-item' },
-	                    '5'
+	                    { className: 'time-item-container' },
+	                    _react2.default.createElement(
+	                        'div',
+	                        { className: 'time-item' },
+	                        _react2.default.createElement('div', { className: 'time-item-mask' }),
+	                        _react2.default.createElement('div', { className: 'time-item-middle-bg' }),
+	                        _react2.default.createElement('div', { className: 'time-item-contents', ref: 'minuteItem' })
+	                    )
 	                )
 	            );
 	        }
@@ -413,7 +473,7 @@
 
 
 	// module
-	exports.push([module.id, "@charset \"utf-8\";\r\n\r\nhtml, body, div, p, a, span {\r\n\tmargin: 0;\r\n\tpadding: 0;\r\n}\r\nhtml, body {\r\n\theight: 100%;\r\n}\r\n\r\n.time-picker-outer {\r\n\tdisplay: -webkit-box;\r\n\tdisplay: -ms-flexbox;\r\n\tdisplay: -webkit-flex;\r\n\tdisplay: flex;\r\n\twidth: 100%;\r\n\tposition: fixed;\r\n\ttop: 200px;\r\n}\r\n.time-item {\r\n\t-webkit-box-flex: 1;\r\n\tflex: 1;\r\n\theight: 6rem;\r\n\tbackground: #ccc;\r\n\ttext-align: center;\r\n}", ""]);
+	exports.push([module.id, "@charset \"utf-8\";\r\n\r\nhtml, body, div, p, a, span {\r\n\tmargin: 0;\r\n\tpadding: 0;\r\n}\r\nhtml, body {\r\n\theight: 100%;\r\n}\r\n\r\n.time-picker-container {\r\n\tdisplay: -webkit-box;\r\n\tdisplay: -ms-flexbox;\r\n\tdisplay: -webkit-flex;\r\n\tdisplay: flex;\r\n\twidth: 100%;\r\n\tposition: fixed;\r\n\ttop: 200px;\r\n}\r\n.time-item-container {\r\n\t-webkit-box-flex: 1;\r\n\tflex: 1;\r\n\ttext-align: center;\r\n}\r\n.time-item {\r\n\tdisplay: block;\r\n    position: relative;\r\n    overflow: hidden;\r\n    height: 238px;\r\n}\r\n.time-item-mask {\r\n\t/*position: absolute;\r\n    left: 0;\r\n    top: 0;\r\n    right: 0;\r\n    bottom: 0;\r\n    z-index: 3;*/\r\n    /*background-image: -webkit-linear-gradient(top, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.6)), -webkit-linear-gradient(bottom, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.6));\r\n    background-image: linear-gradient(to bottom, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.6)), linear-gradient(to top, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.6));\r\n    background-position: top, bottom;\r\n    background-size: 100% 102px;\r\n    background-repeat: no-repeat;*/\r\n}\r\n.time-item-contents {\r\n\tposition: absolute;\r\n    left: 0;\r\n    top: 0;\r\n    right: 0;\r\n    z-index: 2;\r\n}\r\n.time-item-content {\r\n\ttext-align: center;\r\n    font-size: 16px;\r\n    line-height: 34px;\r\n    height: 34px;\r\n    color: #000;\r\n    white-space: nowrap;\r\n    text-overflow: ellipsis;\r\n    overflow: hidden;\r\n}\r\n.time-item-middle-bg {\r\n\tposition: absolute;\r\n\tz-index: 1;\r\n\ttop: 102px;\r\n\tleft: 0;\r\n\tright: 0;\r\n\theight: 34px;\r\n\tborder-top: 1px solid #d0d0d0;\r\n\tborder-bottom: 1px solid #d0d0d0;\r\n}\r\n", ""]);
 
 	// exports
 

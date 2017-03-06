@@ -3,6 +3,7 @@ import './main.css';
 
 const winWidth = window.innerWidth;
 const winHeight = window.innerHeight;
+const itemHeight = 34;
 export default class TimePicker extends Component {
 	constructor(props) {
 		super(props);
@@ -38,11 +39,43 @@ export default class TimePicker extends Component {
             inertia: false,//是否处于惯性状态
 		};
 	}
+    init() {
+        var years = [];
+        for(var i = 2000; i <= 2030; i++) {
+            years.push('<div class="time-item-content">'+i+'</div>');
+        }
+        this.refs.yearItem.innerHTML = years.join('');
+
+        var months = [];
+        for(i = 1; i <= 12; i++) {
+            months.push('<div class="time-item-content">' + i + '</div>');
+        }
+        this.refs.monthItem.innerHTML = months.join('');
+
+        var dates = [];
+        for(i = 1; i <= 31; i++) {
+            dates.push('<div class="time-item-content">' + i + '</div>');
+        }
+        this.refs.dateItem.innerHTML = dates.join('');
+
+        var hours = [];
+        for(i = 0; i <= 23; i++) {
+            hours.push('<div class="time-item-content">' + i + '</div>');
+        }
+        this.refs.hourItem.innerHTML = hours.join('');
+
+        var minutes = [];
+        for(i = 0; i <= 59; i++) {
+            minutes.push('<div class="time-item-content">' + i + '</div>');
+        }
+        this.refs.minuteItem.innerHTML = minutes.join('');
+    }
 	componentDidMount() {
-        var ele = document.querySelectorAll('.time-item')[1];
+        this.init();
+        var ele = this.refs.yearItem;
         this.moveElement(ele, 0, 0);
 
-        var container = document.querySelectorAll('.time-picker-outer')[0];
+        var container = ele.parentNode;
         var containerRect = container.getBoundingClientRect();
         this.setState({
             containerBounding: {
@@ -88,17 +121,13 @@ export default class TimePicker extends Component {
             
             var moveY = evt.pageY - that.state.touchStartY;
             
-            var desTop = that.state.objBounding.top + moveY;
-            var desBottom = that.state.objBounding.bottom + moveY;
-            
-            if(desTop < that.state.containerBounding.top - that.state.objBounding.height) {
-                moveY = that.state.containerBounding.top - that.state.objBounding.height - that.state.objBounding.top;
-            }
-            if(desBottom > that.state.containerBounding.bottom + that.state.objBounding.height) {
-                moveY = that.state.containerBounding.bottom + that.state.objBounding.height - that.state.objBounding.bottom;
-            }
-
             var tempY = that.state.objTranslate.y + moveY;
+            if(tempY > itemHeight * 6) {
+                tempY = itemHeight * 6;
+            }
+            if(tempY < -(that.state.objBounding.height - itemHeight) ) {
+                tempY = -(that.state.objBounding.height - itemHeight);
+            }
             that.moveElement(ele, 0, tempY);
         });
         
@@ -160,8 +189,8 @@ export default class TimePicker extends Component {
 	}
     inBox(ele) {
         var that = this;
-        var maxY = that.state.objBounding.height / 2;
-        var minY = -maxY;
+        var maxY = 3 * itemHeight;
+        var minY = -(that.state.objBounding.height - 4 * itemHeight);
         var moveY;
         if(that.state.objTranslate.y > maxY) {
             moveY = maxY - that.state.objTranslate.y;
@@ -170,15 +199,15 @@ export default class TimePicker extends Component {
             moveY = minY - that.state.objTranslate.y;   
         }
         else {
-            return;
+            //调整位置,使时间块位于中间
+            moveY = Math.ceil(that.state.objTranslate.y / itemHeight) * itemHeight - that.state.objTranslate.y;
         }
-        
+
         var start = 0;
         var during = 40;
         var init = that.state.objTranslate.y;
 
         var run = function () {
-            // 如果用户触摸元素，停止滑动
             if (that.state.touching) {
                 that.setState({
                     objTranslate: {
@@ -213,7 +242,6 @@ export default class TimePicker extends Component {
         ele.style.webkitTransform = 'translate(' + x + 'px,' + y + 'px)';
         ele.style.transform = 'translate3d(' + x + 'px,' + y + 'px, 0)';
         this.setState({
-        	desX: x,
         	moveY: y,
         });
 	}
@@ -230,12 +258,47 @@ export default class TimePicker extends Component {
 
 	render() {
 		return(
-			<div className="time-picker-outer">
-			    <div className="time-item">1</div>
-			    <div className="time-item">2</div>
-			    <div className="time-item">3</div>
-			    <div className="time-item">4</div>
-			    <div className="time-item">5</div>
+			<div className="time-picker-container">
+			    <div className="time-item-container">
+                    <div className="time-item">
+                        <div className="time-item-mask"></div>
+                        <div className="time-item-middle-bg"></div>
+                        <div className="time-item-contents" ref="yearItem">
+                        </div>
+                    </div>
+                </div>
+			    <div className="time-item-container">
+                    <div className="time-item">
+                        <div className="time-item-mask"></div>
+                        <div className="time-item-middle-bg"></div>
+                        <div className="time-item-contents" ref="monthItem">
+                        </div>
+                    </div>
+                </div>
+			    <div className="time-item-container">
+                    <div className="time-item">
+                        <div className="time-item-mask"></div>
+                        <div className="time-item-middle-bg"></div>
+                        <div className="time-item-contents" ref="dateItem">
+                        </div>
+                    </div>
+                </div>
+			    <div className="time-item-container">
+                    <div className="time-item">
+                        <div className="time-item-mask"></div>
+                        <div className="time-item-middle-bg"></div>
+                        <div className="time-item-contents" ref="hourItem">
+                        </div>
+                    </div>
+                </div>
+			    <div className="time-item-container">
+                    <div className="time-item">
+                        <div className="time-item-mask"></div>
+                        <div className="time-item-middle-bg"></div>
+                        <div className="time-item-contents" ref="minuteItem">
+                        </div>
+                    </div>
+                </div>
 			</div>
 		);
 	}
