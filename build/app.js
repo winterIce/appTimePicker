@@ -305,13 +305,13 @@
 	            var that = this;
 	            that.init();
 	            var eleArr = [];
-	            eleArr.push(that.refs.yearItemMask);
-	            eleArr.push(that.refs.monthItemMask);
-	            eleArr.push(that.refs.dateItemMask);
-	            eleArr.push(that.refs.hourItemMask);
-	            eleArr.push(that.refs.minuteItemMask);
+	            eleArr.push(that.refs.yearItem);
+	            eleArr.push(that.refs.monthItem);
+	            eleArr.push(that.refs.dateItem);
+	            eleArr.push(that.refs.hourItem);
+	            eleArr.push(that.refs.minuteItem);
 	            eleArr.forEach(function (item) {
-	                var itemContent = item.nextSibling.nextSibling;
+	                var itemContent = item;
 	                var type = itemContent.getAttribute('data-type');
 	                if (type == 'year') {
 	                    that.moveElement(itemContent, 0, 34 * (2013 - that.state.year));
@@ -326,6 +326,7 @@
 	                }
 
 	                item.addEventListener('touchstart', function (event) {
+	                    event.preventDefault();
 	                    var item = itemContent;
 	                    var evt = event.touches[0] || event;
 	                    var rect = item.getBoundingClientRect();
@@ -371,7 +372,7 @@
 	                });
 
 	                var moveY = evt.pageY - that.state.touchStartY;
-
+	                console.log(evt.pageY, that.state.touchStartY);
 	                var tempY = that.state.objTranslate.y + moveY;
 	                if (tempY > itemHeight * 6) {
 	                    tempY = itemHeight * 6;
@@ -386,6 +387,7 @@
 	                if (!that.state.touching) {
 	                    return;
 	                }
+	                event.preventDefault();
 	                var evt = event.touches[0] || event;
 
 	                that.setState({
@@ -608,7 +610,6 @@
 	                        _react2.default.createElement(
 	                            'div',
 	                            { className: 'time-item' },
-	                            _react2.default.createElement('div', { className: 'time-item-mask', ref: 'yearItemMask' }),
 	                            _react2.default.createElement('div', { className: 'time-item-middle-bg' }),
 	                            _react2.default.createElement('div', { className: 'time-item-contents', ref: 'yearItem', 'data-type': 'year' })
 	                        )
@@ -619,7 +620,6 @@
 	                        _react2.default.createElement(
 	                            'div',
 	                            { className: 'time-item' },
-	                            _react2.default.createElement('div', { className: 'time-item-mask', ref: 'monthItemMask' }),
 	                            _react2.default.createElement('div', { className: 'time-item-middle-bg' }),
 	                            _react2.default.createElement('div', { className: 'time-item-contents', ref: 'monthItem', 'data-type': 'month' })
 	                        )
@@ -630,7 +630,6 @@
 	                        _react2.default.createElement(
 	                            'div',
 	                            { className: 'time-item' },
-	                            _react2.default.createElement('div', { className: 'time-item-mask', ref: 'dateItemMask' }),
 	                            _react2.default.createElement('div', { className: 'time-item-middle-bg' }),
 	                            _react2.default.createElement('div', { className: 'time-item-contents', ref: 'dateItem', 'data-type': 'date' })
 	                        )
@@ -641,7 +640,6 @@
 	                        _react2.default.createElement(
 	                            'div',
 	                            { className: 'time-item' },
-	                            _react2.default.createElement('div', { className: 'time-item-mask', ref: 'hourItemMask' }),
 	                            _react2.default.createElement('div', { className: 'time-item-middle-bg' }),
 	                            _react2.default.createElement('div', { className: 'time-item-contents', ref: 'hourItem', 'data-type': 'hour' })
 	                        )
@@ -652,7 +650,6 @@
 	                        _react2.default.createElement(
 	                            'div',
 	                            { className: 'time-item' },
-	                            _react2.default.createElement('div', { className: 'time-item-mask', ref: 'minuteItemMask' }),
 	                            _react2.default.createElement('div', { className: 'time-item-middle-bg' }),
 	                            _react2.default.createElement('div', { className: 'time-item-contents', ref: 'minuteItem', 'data-type': 'minute' })
 	                        )

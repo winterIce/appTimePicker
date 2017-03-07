@@ -98,13 +98,13 @@ export default class TimePicker extends Component {
         var that = this;
         that.init();
         var eleArr = [];
-        eleArr.push(that.refs.yearItemMask);
-        eleArr.push(that.refs.monthItemMask);
-        eleArr.push(that.refs.dateItemMask);
-        eleArr.push(that.refs.hourItemMask);
-        eleArr.push(that.refs.minuteItemMask);
+        eleArr.push(that.refs.yearItem);
+        eleArr.push(that.refs.monthItem);
+        eleArr.push(that.refs.dateItem);
+        eleArr.push(that.refs.hourItem);
+        eleArr.push(that.refs.minuteItem);
         eleArr.forEach(function(item) {
-            var itemContent = item.nextSibling.nextSibling;
+            var itemContent = item;
             var type = itemContent.getAttribute('data-type');
             if(type == 'year') {
                 that.moveElement(itemContent, 0, 34 * (2013 - that.state.year));    
@@ -123,6 +123,7 @@ export default class TimePicker extends Component {
             }
 
             item.addEventListener('touchstart', function(event) {
+                event.preventDefault();
                 var item = itemContent;
                 var evt = event.touches[0] || event;
                 var rect = item.getBoundingClientRect();
@@ -168,7 +169,7 @@ export default class TimePicker extends Component {
             });
             
             var moveY = evt.pageY - that.state.touchStartY;
-            
+            console.log(evt.pageY, that.state.touchStartY);
             var tempY = that.state.objTranslate.y + moveY;
             if(tempY > itemHeight * 6) {
                 tempY = itemHeight * 6;
@@ -183,6 +184,7 @@ export default class TimePicker extends Component {
             if(!that.state.touching) {
                 return;
             }
+            event.preventDefault();
             var evt = event.touches[0] || event;
             
             that.setState({
@@ -380,7 +382,9 @@ export default class TimePicker extends Component {
                     </div>
     			    <div className="time-item-container">
                         <div className="time-item">
+                        {/*
                             <div className="time-item-mask" ref="yearItemMask"></div>
+                        */}
                             <div className="time-item-middle-bg"></div>
                             <div className="time-item-contents" ref="yearItem" data-type="year">
                             </div>
@@ -388,7 +392,9 @@ export default class TimePicker extends Component {
                     </div>
     			    <div className="time-item-container">
                         <div className="time-item">
+                        {/*
                             <div className="time-item-mask" ref="monthItemMask"></div>
+                        */}
                             <div className="time-item-middle-bg"></div>
                             <div className="time-item-contents" ref="monthItem" data-type="month">
                             </div>
@@ -396,7 +402,9 @@ export default class TimePicker extends Component {
                     </div>
     			    <div className="time-item-container">
                         <div className="time-item">
+                        {/*
                             <div className="time-item-mask" ref="dateItemMask"></div>
+                        */}
                             <div className="time-item-middle-bg"></div>
                             <div className="time-item-contents" ref="dateItem" data-type="date">
                             </div>
@@ -404,7 +412,9 @@ export default class TimePicker extends Component {
                     </div>
     			    <div className="time-item-container">
                         <div className="time-item">
+                        {/*
                             <div className="time-item-mask" ref="hourItemMask"></div>
+                        */}
                             <div className="time-item-middle-bg"></div>
                             <div className="time-item-contents" ref="hourItem" data-type="hour">
                             </div>
@@ -412,7 +422,9 @@ export default class TimePicker extends Component {
                     </div>
     			    <div className="time-item-container">
                         <div className="time-item">
+                        {/*
                             <div className="time-item-mask" ref="minuteItemMask"></div>
+                        */}
                             <div className="time-item-middle-bg"></div>
                             <div className="time-item-contents" ref="minuteItem" data-type="minute">
                             </div>
