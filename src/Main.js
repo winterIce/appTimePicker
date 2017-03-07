@@ -15,6 +15,7 @@ export default class Main extends Component {
             that.setState({
             	showTime: true,
             });
+            this.blur();
         });
 	}
 	okHandler(val) {
@@ -31,8 +32,9 @@ export default class Main extends Component {
 	render() {
 		return (
 			<div>
-	            <div id="main">
-	                <input ref="startTime" type="text" value={this.state.startTime} />   
+	            <div id="main" style={{marginTop: '100px'}}>
+	                时间的朋友<br />
+	                <input ref="startTime" type="text" value={this.state.startTime} style={{width: '200px', height: '50px'}} />
 	            </div>
 	            <div ref="timeOuter" style={ this.state.showTime ? {} : {display: 'none'} }>
                     <TimePicker okHandler={this.okHandler.bind(this)} cancelHandler={this.cancelHandler.bind(this)} />

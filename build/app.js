@@ -123,6 +123,7 @@
 					that.setState({
 						showTime: true
 					});
+					this.blur();
 				});
 			}
 		}, {
@@ -148,8 +149,10 @@
 					null,
 					_react2.default.createElement(
 						'div',
-						{ id: 'main' },
-						_react2.default.createElement('input', { ref: 'startTime', type: 'text', value: this.state.startTime })
+						{ id: 'main', style: { marginTop: '100px' } },
+						'\u65F6\u95F4\u7684\u670B\u53CB',
+						_react2.default.createElement('br', null),
+						_react2.default.createElement('input', { ref: 'startTime', type: 'text', value: this.state.startTime, style: { width: '200px', height: '50px' } })
 					),
 					_react2.default.createElement(
 						'div',
