@@ -49,36 +49,38 @@ export default class TimePicker extends Component {
             date: 0,
             hour: 0,
             minute: 0,
+
+            ansTime: '',
 		};
 	}
     init() {
         var years = [];
         for(var i = 2010; i <= 2020; i++) {
-            years.push('<div class="time-item-content">' + i + '</div>');
+            years.push('<div class="time-item-content">' + i + '年</div>');
         }
         this.refs.yearItem.innerHTML = years.join('');
 
         var months = [];
         for(i = 1; i <= 12; i++) {
-            months.push('<div class="time-item-content">' + this.addZero(i) + '</div>');
+            months.push('<div class="time-item-content">' + this.addZero(i) + '月</div>');
         }
         this.refs.monthItem.innerHTML = months.join('');
 
         var dates = [];
         for(i = 1; i <= 31; i++) {
-            dates.push('<div class="time-item-content">' + this.addZero(i) + '</div>');
+            dates.push('<div class="time-item-content">' + this.addZero(i) + '日</div>');
         }
         this.refs.dateItem.innerHTML = dates.join('');
 
         var hours = [];
         for(i = 0; i <= 23; i++) {
-            hours.push('<div class="time-item-content">' + this.addZero(i) + '</div>');
+            hours.push('<div class="time-item-content">' + this.addZero(i) + '时</div>');
         }
         this.refs.hourItem.innerHTML = hours.join('');
 
         var minutes = [];
         for(i = 0; i <= 59; i++) {
-            minutes.push('<div class="time-item-content">' + this.addZero(i) + '</div>');
+            minutes.push('<div class="time-item-content">' + this.addZero(i) + '分</div>');
         }
         this.refs.minuteItem.innerHTML = minutes.join('');
     }
@@ -235,6 +237,12 @@ export default class TimePicker extends Component {
 
             slide();
         });
+
+        //初始化时间
+        var time = this.state.year + '-' + this.addZero(this.state.month) + '-' + this.addZero(this.state.date) + ' ' + this.addZero(this.state.hour) + ':' + this.addZero(this.state.minute) + ':' + '00';
+        this.setState({
+            ansTime: time,
+        });
 	}
     inBox(ele) {
         var that = this;
@@ -325,7 +333,11 @@ export default class TimePicker extends Component {
                 minute: 3 - y / itemHeight,
             });
         }
-        console.log(this.state.year + '-' + this.addZero(this.state.month) + '-' + this.addZero(this.state.date) + ' ' + this.addZero(this.state.hour) + ':' + this.addZero(this.state.minute) + ':' + '00');
+        var time = this.state.year + '-' + this.addZero(this.state.month) + '-' + this.addZero(this.state.date) + ' ' + this.addZero(this.state.hour) + ':' + this.addZero(this.state.minute) + ':' + '00';
+        console.log(time);
+        this.setState({
+            ansTime: time,
+        });
     }
 	moveElement(ele, x, y) {
         var x = Math.round(1000 * x) / 1000;
@@ -353,51 +365,61 @@ export default class TimePicker extends Component {
         }
         return n;
     }
+    okHandler() {
+        this.props.okHandler(this.state.ansTime);
+    }
 
 	render() {
 		return(
-			<div className="time-picker-container">
-			    <div className="time-item-container">
-                    <div className="time-item">
-                        <div className="time-item-mask" ref="yearItemMask"></div>
-                        <div className="time-item-middle-bg"></div>
-                        <div className="time-item-contents" ref="yearItem" data-type="year">
+            <div>
+                <div className="shadow-layer"></div>
+    			<div className="time-picker-container">
+                    <div className="operate-container">
+                        <div ref="okBtn" className="operate-btn" onClick={this.props.cancelHandler.bind(this)}>取消</div>
+                        <div ref="cancelBtn" className="operate-btn" onClick={this.okHandler.bind(this)}>确定</div>
+                    </div>
+    			    <div className="time-item-container">
+                        <div className="time-item">
+                            <div className="time-item-mask" ref="yearItemMask"></div>
+                            <div className="time-item-middle-bg"></div>
+                            <div className="time-item-contents" ref="yearItem" data-type="year">
+                            </div>
                         </div>
                     </div>
-                </div>
-			    <div className="time-item-container">
-                    <div className="time-item">
-                        <div className="time-item-mask" ref="monthItemMask"></div>
-                        <div className="time-item-middle-bg"></div>
-                        <div className="time-item-contents" ref="monthItem" data-type="month">
+    			    <div className="time-item-container">
+                        <div className="time-item">
+                            <div className="time-item-mask" ref="monthItemMask"></div>
+                            <div className="time-item-middle-bg"></div>
+                            <div className="time-item-contents" ref="monthItem" data-type="month">
+                            </div>
                         </div>
                     </div>
-                </div>
-			    <div className="time-item-container">
-                    <div className="time-item">
-                        <div className="time-item-mask" ref="dateItemMask"></div>
-                        <div className="time-item-middle-bg"></div>
-                        <div className="time-item-contents" ref="dateItem" data-type="date">
+    			    <div className="time-item-container">
+                        <div className="time-item">
+                            <div className="time-item-mask" ref="dateItemMask"></div>
+                            <div className="time-item-middle-bg"></div>
+                            <div className="time-item-contents" ref="dateItem" data-type="date">
+                            </div>
                         </div>
                     </div>
-                </div>
-			    <div className="time-item-container">
-                    <div className="time-item">
-                        <div className="time-item-mask" ref="hourItemMask"></div>
-                        <div className="time-item-middle-bg"></div>
-                        <div className="time-item-contents" ref="hourItem" data-type="hour">
+    			    <div className="time-item-container">
+                        <div className="time-item">
+                            <div className="time-item-mask" ref="hourItemMask"></div>
+                            <div className="time-item-middle-bg"></div>
+                            <div className="time-item-contents" ref="hourItem" data-type="hour">
+                            </div>
                         </div>
                     </div>
-                </div>
-			    <div className="time-item-container">
-                    <div className="time-item">
-                        <div className="time-item-mask" ref="minuteItemMask"></div>
-                        <div className="time-item-middle-bg"></div>
-                        <div className="time-item-contents" ref="minuteItem" data-type="minute">
+    			    <div className="time-item-container">
+                        <div className="time-item">
+                            <div className="time-item-mask" ref="minuteItemMask"></div>
+                            <div className="time-item-middle-bg"></div>
+                            <div className="time-item-contents" ref="minuteItem" data-type="minute">
+                            </div>
                         </div>
                     </div>
-                </div>
-			</div>
+    			</div>
+            </div>
 		);
 	}
 }

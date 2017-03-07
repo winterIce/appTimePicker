@@ -1,5 +1,5 @@
 import React from 'react';
 import { render } from 'react-dom';
-import TimePicker from './TimePicker';
+import Main from './Main';
 
-render(<TimePicker />, document.getElementById('outer'));
+render(<Main />, document.getElementById('outer'));

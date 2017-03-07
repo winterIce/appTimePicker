@@ -52,13 +52,13 @@
 
 	var _reactDom = __webpack_require__(2);
 
-	var _TimePicker = __webpack_require__(3);
+	var _Main = __webpack_require__(3);
 
-	var _TimePicker2 = _interopRequireDefault(_TimePicker);
+	var _Main2 = _interopRequireDefault(_Main);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	(0, _reactDom.render)(_react2.default.createElement(_TimePicker2.default, null), document.getElementById('outer'));
+	(0, _reactDom.render)(_react2.default.createElement(_Main2.default, null), document.getElementById('outer'));
 
 /***/ },
 /* 1 */
@@ -79,6 +79,99 @@
 	'use strict';
 
 	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _TimePicker = __webpack_require__(4);
+
+	var _TimePicker2 = _interopRequireDefault(_TimePicker);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var Main = function (_Component) {
+		_inherits(Main, _Component);
+
+		function Main(props) {
+			_classCallCheck(this, Main);
+
+			var _this = _possibleConstructorReturn(this, (Main.__proto__ || Object.getPrototypeOf(Main)).call(this, props));
+
+			_this.state = {
+				startTime: '',
+				showTime: false
+			};
+			return _this;
+		}
+
+		_createClass(Main, [{
+			key: 'componentDidMount',
+			value: function componentDidMount() {
+				var that = this;
+				that.refs.startTime.addEventListener('focus', function (evt) {
+					that.setState({
+						showTime: true
+					});
+				});
+			}
+		}, {
+			key: 'okHandler',
+			value: function okHandler(val) {
+				this.setState({
+					startTime: val,
+					showTime: false
+				});
+			}
+		}, {
+			key: 'cancelHandler',
+			value: function cancelHandler() {
+				this.setState({
+					showTime: false
+				});
+			}
+		}, {
+			key: 'render',
+			value: function render() {
+				return _react2.default.createElement(
+					'div',
+					null,
+					_react2.default.createElement(
+						'div',
+						{ id: 'main' },
+						_react2.default.createElement('input', { ref: 'startTime', type: 'text', value: this.state.startTime })
+					),
+					_react2.default.createElement(
+						'div',
+						{ ref: 'timeOuter', style: this.state.showTime ? {} : { display: 'none' } },
+						_react2.default.createElement(_TimePicker2.default, { okHandler: this.okHandler.bind(this), cancelHandler: this.cancelHandler.bind(this) })
+					)
+				);
+			}
+		}]);
+
+		return Main;
+	}(_react.Component);
+
+	exports.default = Main;
+
+/***/ },
+/* 4 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
 
@@ -88,7 +181,7 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	__webpack_require__(4);
+	__webpack_require__(5);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -151,7 +244,9 @@
 	            month: 0,
 	            date: 0,
 	            hour: 0,
-	            minute: 0
+	            minute: 0,
+
+	            ansTime: ''
 	        };
 	        return _this;
 	    }
@@ -161,31 +256,31 @@
 	        value: function init() {
 	            var years = [];
 	            for (var i = 2010; i <= 2020; i++) {
-	                years.push('<div class="time-item-content">' + i + '</div>');
+	                years.push('<div class="time-item-content">' + i + '年</div>');
 	            }
 	            this.refs.yearItem.innerHTML = years.join('');
 
 	            var months = [];
 	            for (i = 1; i <= 12; i++) {
-	                months.push('<div class="time-item-content">' + this.addZero(i) + '</div>');
+	                months.push('<div class="time-item-content">' + this.addZero(i) + '月</div>');
 	            }
 	            this.refs.monthItem.innerHTML = months.join('');
 
 	            var dates = [];
 	            for (i = 1; i <= 31; i++) {
-	                dates.push('<div class="time-item-content">' + this.addZero(i) + '</div>');
+	                dates.push('<div class="time-item-content">' + this.addZero(i) + '日</div>');
 	            }
 	            this.refs.dateItem.innerHTML = dates.join('');
 
 	            var hours = [];
 	            for (i = 0; i <= 23; i++) {
-	                hours.push('<div class="time-item-content">' + this.addZero(i) + '</div>');
+	                hours.push('<div class="time-item-content">' + this.addZero(i) + '时</div>');
 	            }
 	            this.refs.hourItem.innerHTML = hours.join('');
 
 	            var minutes = [];
 	            for (i = 0; i <= 59; i++) {
-	                minutes.push('<div class="time-item-content">' + this.addZero(i) + '</div>');
+	                minutes.push('<div class="time-item-content">' + this.addZero(i) + '分</div>');
 	            }
 	            this.refs.minuteItem.innerHTML = minutes.join('');
 	        }
@@ -342,6 +437,12 @@
 
 	                slide();
 	            });
+
+	            //初始化时间
+	            var time = this.state.year + '-' + this.addZero(this.state.month) + '-' + this.addZero(this.state.date) + ' ' + this.addZero(this.state.hour) + ':' + this.addZero(this.state.minute) + ':' + '00';
+	            this.setState({
+	                ansTime: time
+	            });
 	        }
 	    }, {
 	        key: 'inBox',
@@ -430,7 +531,11 @@
 	                    minute: 3 - y / itemHeight
 	                });
 	            }
-	            console.log(this.state.year + '-' + this.addZero(this.state.month) + '-' + this.addZero(this.state.date) + ' ' + this.addZero(this.state.hour) + ':' + this.addZero(this.state.minute) + ':' + '00');
+	            var time = this.state.year + '-' + this.addZero(this.state.month) + '-' + this.addZero(this.state.date) + ' ' + this.addZero(this.state.hour) + ':' + this.addZero(this.state.minute) + ':' + '00';
+	            console.log(time);
+	            this.setState({
+	                ansTime: time
+	            });
 	        }
 	    }, {
 	        key: 'moveElement',
@@ -466,64 +571,88 @@
 	            return n;
 	        }
 	    }, {
+	        key: 'okHandler',
+	        value: function okHandler() {
+	            this.props.okHandler(this.state.ansTime);
+	        }
+	    }, {
 	        key: 'render',
 	        value: function render() {
 	            return _react2.default.createElement(
 	                'div',
-	                { className: 'time-picker-container' },
+	                null,
+	                _react2.default.createElement('div', { className: 'shadow-layer' }),
 	                _react2.default.createElement(
 	                    'div',
-	                    { className: 'time-item-container' },
+	                    { className: 'time-picker-container' },
 	                    _react2.default.createElement(
 	                        'div',
-	                        { className: 'time-item' },
-	                        _react2.default.createElement('div', { className: 'time-item-mask', ref: 'yearItemMask' }),
-	                        _react2.default.createElement('div', { className: 'time-item-middle-bg' }),
-	                        _react2.default.createElement('div', { className: 'time-item-contents', ref: 'yearItem', 'data-type': 'year' })
-	                    )
-	                ),
-	                _react2.default.createElement(
-	                    'div',
-	                    { className: 'time-item-container' },
+	                        { className: 'operate-container' },
+	                        _react2.default.createElement(
+	                            'div',
+	                            { ref: 'okBtn', className: 'operate-btn', onClick: this.props.cancelHandler.bind(this) },
+	                            '\u53D6\u6D88'
+	                        ),
+	                        _react2.default.createElement(
+	                            'div',
+	                            { ref: 'cancelBtn', className: 'operate-btn', onClick: this.okHandler.bind(this) },
+	                            '\u786E\u5B9A'
+	                        )
+	                    ),
 	                    _react2.default.createElement(
 	                        'div',
-	                        { className: 'time-item' },
-	                        _react2.default.createElement('div', { className: 'time-item-mask', ref: 'monthItemMask' }),
-	                        _react2.default.createElement('div', { className: 'time-item-middle-bg' }),
-	                        _react2.default.createElement('div', { className: 'time-item-contents', ref: 'monthItem', 'data-type': 'month' })
-	                    )
-	                ),
-	                _react2.default.createElement(
-	                    'div',
-	                    { className: 'time-item-container' },
+	                        { className: 'time-item-container' },
+	                        _react2.default.createElement(
+	                            'div',
+	                            { className: 'time-item' },
+	                            _react2.default.createElement('div', { className: 'time-item-mask', ref: 'yearItemMask' }),
+	                            _react2.default.createElement('div', { className: 'time-item-middle-bg' }),
+	                            _react2.default.createElement('div', { className: 'time-item-contents', ref: 'yearItem', 'data-type': 'year' })
+	                        )
+	                    ),
 	                    _react2.default.createElement(
 	                        'div',
-	                        { className: 'time-item' },
-	                        _react2.default.createElement('div', { className: 'time-item-mask', ref: 'dateItemMask' }),
-	                        _react2.default.createElement('div', { className: 'time-item-middle-bg' }),
-	                        _react2.default.createElement('div', { className: 'time-item-contents', ref: 'dateItem', 'data-type': 'date' })
-	                    )
-	                ),
-	                _react2.default.createElement(
-	                    'div',
-	                    { className: 'time-item-container' },
+	                        { className: 'time-item-container' },
+	                        _react2.default.createElement(
+	                            'div',
+	                            { className: 'time-item' },
+	                            _react2.default.createElement('div', { className: 'time-item-mask', ref: 'monthItemMask' }),
+	                            _react2.default.createElement('div', { className: 'time-item-middle-bg' }),
+	                            _react2.default.createElement('div', { className: 'time-item-contents', ref: 'monthItem', 'data-type': 'month' })
+	                        )
+	                    ),
 	                    _react2.default.createElement(
 	                        'div',
-	                        { className: 'time-item' },
-	                        _react2.default.createElement('div', { className: 'time-item-mask', ref: 'hourItemMask' }),
-	                        _react2.default.createElement('div', { className: 'time-item-middle-bg' }),
-	                        _react2.default.createElement('div', { className: 'time-item-contents', ref: 'hourItem', 'data-type': 'hour' })
-	                    )
-	                ),
-	                _react2.default.createElement(
-	                    'div',
-	                    { className: 'time-item-container' },
+	                        { className: 'time-item-container' },
+	                        _react2.default.createElement(
+	                            'div',
+	                            { className: 'time-item' },
+	                            _react2.default.createElement('div', { className: 'time-item-mask', ref: 'dateItemMask' }),
+	                            _react2.default.createElement('div', { className: 'time-item-middle-bg' }),
+	                            _react2.default.createElement('div', { className: 'time-item-contents', ref: 'dateItem', 'data-type': 'date' })
+	                        )
+	                    ),
 	                    _react2.default.createElement(
 	                        'div',
-	                        { className: 'time-item' },
-	                        _react2.default.createElement('div', { className: 'time-item-mask', ref: 'minuteItemMask' }),
-	                        _react2.default.createElement('div', { className: 'time-item-middle-bg' }),
-	                        _react2.default.createElement('div', { className: 'time-item-contents', ref: 'minuteItem', 'data-type': 'minute' })
+	                        { className: 'time-item-container' },
+	                        _react2.default.createElement(
+	                            'div',
+	                            { className: 'time-item' },
+	                            _react2.default.createElement('div', { className: 'time-item-mask', ref: 'hourItemMask' }),
+	                            _react2.default.createElement('div', { className: 'time-item-middle-bg' }),
+	                            _react2.default.createElement('div', { className: 'time-item-contents', ref: 'hourItem', 'data-type': 'hour' })
+	                        )
+	                    ),
+	                    _react2.default.createElement(
+	                        'div',
+	                        { className: 'time-item-container' },
+	                        _react2.default.createElement(
+	                            'div',
+	                            { className: 'time-item' },
+	                            _react2.default.createElement('div', { className: 'time-item-mask', ref: 'minuteItemMask' }),
+	                            _react2.default.createElement('div', { className: 'time-item-middle-bg' }),
+	                            _react2.default.createElement('div', { className: 'time-item-contents', ref: 'minuteItem', 'data-type': 'minute' })
+	                        )
 	                    )
 	                )
 	            );
@@ -536,16 +665,16 @@
 	exports.default = TimePicker;
 
 /***/ },
-/* 4 */
+/* 5 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 
 	// load the styles
-	var content = __webpack_require__(5);
+	var content = __webpack_require__(6);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
-	var update = __webpack_require__(7)(content, {});
+	var update = __webpack_require__(8)(content, {});
 	if(content.locals) module.exports = content.locals;
 	// Hot Module Replacement
 	if(false) {
@@ -562,21 +691,21 @@
 	}
 
 /***/ },
-/* 5 */
+/* 6 */
 /***/ function(module, exports, __webpack_require__) {
 
-	exports = module.exports = __webpack_require__(6)();
+	exports = module.exports = __webpack_require__(7)();
 	// imports
 
 
 	// module
-	exports.push([module.id, "@charset \"utf-8\";\r\n\r\nhtml, body, div, p, a, span {\r\n\tmargin: 0;\r\n\tpadding: 0;\r\n}\r\nhtml, body {\r\n\theight: 100%;\r\n}\r\n\r\n.time-picker-container {\r\n\tdisplay: -webkit-box;\r\n\tdisplay: -ms-flexbox;\r\n\tdisplay: -webkit-flex;\r\n\tdisplay: flex;\r\n\twidth: 100%;\r\n\tposition: fixed;\r\n\ttop: 200px;\r\n}\r\n.time-item-container {\r\n\t-webkit-box-flex: 1;\r\n\tflex: 1;\r\n\ttext-align: center;\r\n}\r\n.time-item {\r\n\tdisplay: block;\r\n    position: relative;\r\n    overflow: hidden;\r\n    height: 238px;\r\n}\r\n.time-item-mask {\r\n\tposition: absolute;\r\n    left: 0;\r\n    top: 0;\r\n    right: 0;\r\n    bottom: 0;\r\n    z-index: 3;\r\n    background-image: -webkit-linear-gradient(top, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.6)), -webkit-linear-gradient(bottom, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.6));\r\n    background-image: linear-gradient(to bottom, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.6)), linear-gradient(to top, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.6));\r\n    background-position: top, bottom;\r\n    background-size: 100% 102px;\r\n    background-repeat: no-repeat;\r\n}\r\n.time-item-contents {\r\n\tposition: absolute;\r\n    left: 0;\r\n    top: 0;\r\n    right: 0;\r\n    z-index: 2;\r\n}\r\n.time-item-content {\r\n\ttext-align: center;\r\n    font-size: 16px;\r\n    line-height: 34px;\r\n    height: 34px;\r\n    color: #000;\r\n    white-space: nowrap;\r\n    text-overflow: ellipsis;\r\n    overflow: hidden;\r\n}\r\n.time-item-middle-bg {\r\n\tposition: absolute;\r\n\tz-index: 1;\r\n\ttop: 102px;\r\n\tleft: 0;\r\n\tright: 0;\r\n\theight: 34px;\r\n\tborder-top: 1px solid #d0d0d0;\r\n\tborder-bottom: 1px solid #d0d0d0;\r\n}\r\n", ""]);
+	exports.push([module.id, "@charset \"utf-8\";\r\n\r\nhtml, body, div, p, a, span {\r\n\tmargin: 0;\r\n\tpadding: 0;\r\n}\r\nhtml, body {\r\n\theight: 100%;\r\n}\r\n.shadow-layer {\r\n\tposition: fixed;\r\n\ttop: 0;\r\n\tbottom: 0;\r\n\tleft: 0;\r\n\tright: 0;\r\n\tz-index: 1;\r\n\tbackground: #000;\r\n    opacity: 0.3;\r\n}\r\n.time-picker-container {\r\n\tdisplay: -webkit-box;\r\n\tdisplay: -ms-flexbox;\r\n\tdisplay: -webkit-flex;\r\n\tdisplay: flex;\r\n\twidth: 100%;\r\n\tposition: fixed;\r\n\tz-index: 2;\r\n\ttop: 50%;\r\n\tmargin-top: -119px;\r\n}\r\n.time-item-container {\r\n\t-webkit-box-flex: 1;\r\n\tflex: 1;\r\n\ttext-align: center;\r\n}\r\n.time-item {\r\n\tdisplay: block;\r\n    position: relative;\r\n    overflow: hidden;\r\n    height: 238px;\r\n}\r\n.time-item-mask {\r\n\tposition: absolute;\r\n    left: 0;\r\n    top: 0;\r\n    right: 0;\r\n    bottom: 0;\r\n    z-index: 5;\r\n    background-image: -webkit-linear-gradient(top, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.6)), -webkit-linear-gradient(bottom, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.6));\r\n    background-image: linear-gradient(to bottom, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.6)), linear-gradient(to top, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.6));\r\n    background-position: top, bottom;\r\n    background-size: 100% 102px;\r\n    background-repeat: no-repeat;\r\n}\r\n.time-item-contents {\r\n\tposition: absolute;\r\n    left: 0;\r\n    top: 0;\r\n    right: 0;\r\n    z-index: 4;\r\n}\r\n.time-item-content {\r\n\ttext-align: center;\r\n    font-size: 16px;\r\n    line-height: 34px;\r\n    height: 34px;\r\n    color: #000;\r\n    white-space: nowrap;\r\n    text-overflow: ellipsis;\r\n    overflow: hidden;\r\n}\r\n.time-item-middle-bg {\r\n\tposition: absolute;\r\n\tz-index: 3;\r\n\ttop: 102px;\r\n\tleft: 0;\r\n\tright: 0;\r\n\theight: 34px;\r\n\tborder-top: 1px solid #d0d0d0;\r\n\tborder-bottom: 1px solid #d0d0d0;\r\n\tbackground: #fff;\r\n}\r\n.operate-container {\r\n\tposition: absolute;\r\n\tdisplay: -webkit-box;\r\n\tdisplay: -ms-flexbox;\r\n\tdisplay: -webkit-flex;\r\n\tdisplay: flex;\r\n\twidth: 100%;\r\n\tbottom: -42px;\r\n\theight: 40px;\r\n\tbackground: #fff;\r\n\tborder-bottom: 1px solid #d0d0d0;\r\n\tborder-top: 1px solid #d0d0d0;\r\n}\r\n.operate-btn {\r\n\t-webkit-box-flex: 1;\r\n    flex: 1;\r\n    height: 40px;\r\n    line-height: 40px;\r\n    font-size: 16px;\r\n    color: #000;\r\n    text-align: center;\r\n}\r\n.operate-btn:first-child {\r\n\tborder-right: 1px solid #d0d0d0;\r\n}", ""]);
 
 	// exports
 
 
 /***/ },
-/* 6 */
+/* 7 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -631,7 +760,7 @@
 	};
 
 /***/ },
-/* 7 */
+/* 8 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/*

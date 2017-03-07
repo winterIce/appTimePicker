@@ -7,7 +7,16 @@ html, body, div, p, a, span {
 html, body {
 	height: 100%;
 }
-
+.shadow-layer {
+	position: fixed;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	z-index: 1;
+	background: #000;
+    opacity: 0.3;
+}
 .time-picker-container {
 	display: -webkit-box;
 	display: -ms-flexbox;
@@ -15,7 +24,9 @@ html, body {
 	display: flex;
 	width: 100%;
 	position: fixed;
-	top: 200px;
+	z-index: 2;
+	top: 50%;
+	margin-top: -119px;
 }
 .time-item-container {
 	-webkit-box-flex: 1;
@@ -34,7 +45,7 @@ html, body {
     top: 0;
     right: 0;
     bottom: 0;
-    z-index: 3;
+    z-index: 5;
     background-image: -webkit-linear-gradient(top, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.6)), -webkit-linear-gradient(bottom, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.6));
     background-image: linear-gradient(to bottom, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.6)), linear-gradient(to top, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.6));
     background-position: top, bottom;
@@ -46,7 +57,7 @@ html, body {
     left: 0;
     top: 0;
     right: 0;
-    z-index: 2;
+    z-index: 4;
 }
 .time-item-content {
 	text-align: center;
@@ -60,11 +71,37 @@ html, body {
 }
 .time-item-middle-bg {
 	position: absolute;
-	z-index: 1;
+	z-index: 3;
 	top: 102px;
 	left: 0;
 	right: 0;
 	height: 34px;
 	border-top: 1px solid #d0d0d0;
 	border-bottom: 1px solid #d0d0d0;
+	background: #fff;
+}
+.operate-container {
+	position: absolute;
+	display: -webkit-box;
+	display: -ms-flexbox;
+	display: -webkit-flex;
+	display: flex;
+	width: 100%;
+	bottom: -42px;
+	height: 40px;
+	background: #fff;
+	border-bottom: 1px solid #d0d0d0;
+	border-top: 1px solid #d0d0d0;
+}
+.operate-btn {
+	-webkit-box-flex: 1;
+    flex: 1;
+    height: 40px;
+    line-height: 40px;
+    font-size: 16px;
+    color: #000;
+    text-align: center;
+}
+.operate-btn:first-child {
+	border-right: 1px solid #d0d0d0;
 }
