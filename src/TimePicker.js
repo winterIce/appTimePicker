@@ -464,7 +464,7 @@ export default class TimePicker extends Component {
                     inertiaMinute: false,
                 });
             }
-            that.calTime(init);
+            that.calTime(init, ele);
             return;
         }
 
@@ -562,11 +562,11 @@ export default class TimePicker extends Component {
                 });
             }
 
-            that.calTime(y);
+            that.calTime(y, ele);
         }
     }
-    calTime(y) {
-        var type = this.state.curType;
+    calTime(y, ele) {
+        var type = ele.getAttribute('data-type');
         if(type == 'year') {
             this.setState({
                 moveYYear: y,
@@ -597,11 +597,7 @@ export default class TimePicker extends Component {
                 minute: 3 - y / itemHeight,
             });
         }
-        var time = this.state.year + '-' + this.addZero(this.state.month) + '-' + this.addZero(this.state.date) + ' ' + this.addZero(this.state.hour) + ':' + this.addZero(this.state.minute) + ':' + '00';
-        console.log(time);
-        this.setState({
-            ansTime: time,
-        });
+        
         var month = this.state.month;
         var year = this.state.year;
         if(type == 'month') {
@@ -645,6 +641,11 @@ export default class TimePicker extends Component {
                 }
             }
         }
+        var time = this.state.year + '-' + this.addZero(this.state.month) + '-' + this.addZero(this.state.date) + ' ' + this.addZero(this.state.hour) + ':' + this.addZero(this.state.minute) + ':' + '00';
+        console.log(time);
+        this.setState({
+            ansTime: time,
+        });
     }
 
     setDateCount(cnt) {

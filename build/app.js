@@ -636,7 +636,7 @@
 	                        inertiaMinute: false
 	                    });
 	                }
-	                that.calTime(init);
+	                that.calTime(init, ele);
 	                return;
 	            }
 
@@ -724,13 +724,13 @@
 	                    });
 	                }
 
-	                that.calTime(y);
+	                that.calTime(y, ele);
 	            }
 	        }
 	    }, {
 	        key: 'calTime',
-	        value: function calTime(y) {
-	            var type = this.state.curType;
+	        value: function calTime(y, ele) {
+	            var type = ele.getAttribute('data-type');
 	            if (type == 'year') {
 	                this.setState({
 	                    moveYYear: y,
@@ -757,11 +757,7 @@
 	                    minute: 3 - y / itemHeight
 	                });
 	            }
-	            var time = this.state.year + '-' + this.addZero(this.state.month) + '-' + this.addZero(this.state.date) + ' ' + this.addZero(this.state.hour) + ':' + this.addZero(this.state.minute) + ':' + '00';
-	            console.log(time);
-	            this.setState({
-	                ansTime: time
-	            });
+
 	            var month = this.state.month;
 	            var year = this.state.year;
 	            if (type == 'month') {
@@ -800,6 +796,11 @@
 	                    }
 	                }
 	            }
+	            var time = this.state.year + '-' + this.addZero(this.state.month) + '-' + this.addZero(this.state.date) + ' ' + this.addZero(this.state.hour) + ':' + this.addZero(this.state.minute) + ':' + '00';
+	            console.log(time);
+	            this.setState({
+	                ansTime: time
+	            });
 	        }
 	    }, {
 	        key: 'setDateCount',
