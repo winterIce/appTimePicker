@@ -316,31 +316,31 @@
 	                var type = itemContent.getAttribute('data-type');
 	                var y = 0;
 	                if (type == 'year') {
-	                    y = 34 * (2013 - that.state.year);
+	                    y = itemHeight * (2013 - that.state.year);
 	                    that.moveElement(itemContent, 0, y);
 	                    that.setState({
 	                        moveYYear: y
 	                    });
 	                } else if (type == 'month') {
-	                    y = 34 * (4 - that.state.month);
+	                    y = itemHeight * (4 - that.state.month);
 	                    that.moveElement(itemContent, 0, y);
 	                    that.setState({
 	                        moveYMonth: y
 	                    });
 	                } else if (type == 'date') {
-	                    y = 34 * (4 - that.state.date);
+	                    y = itemHeight * (4 - that.state.date);
 	                    that.moveElement(itemContent, 0, y);
 	                    that.setState({
 	                        moveYDate: y
 	                    });
 	                } else if (type == 'hour') {
-	                    y = 34 * (3 - that.state.hour);
+	                    y = itemHeight * (3 - that.state.hour);
 	                    that.moveElement(itemContent, 0, y);
 	                    that.setState({
 	                        moveYHour: y
 	                    });
 	                } else if (type == 'minute') {
-	                    y = 34 * (3 - that.state.minute);
+	                    y = itemHeight * (3 - that.state.minute);
 	                    that.moveElement(itemContent, 0, y);
 	                    that.setState({
 	                        moveYMinute: y
@@ -643,6 +643,63 @@
 	            console.log(time);
 	            this.setState({
 	                ansTime: time
+	            });
+	            var month = this.state.month;
+	            var year = this.state.year;
+	            if (type == 'month') {
+	                if (month == 1 || month == 3 || month == 5 || month == 7 || month == 8 || month == 10 || month == 12) {
+	                    this.setDateCount(31);
+	                } else if (month == 4 || month == 6 || month == 9 || month == 11) {
+	                    this.setDateCount(30);
+	                    if (this.state.date > 30) {
+	                        this.setDateNum(30);
+	                    }
+	                } else if (month == 2) {
+	                    if (year % 4 == 0 && year % 100 != 0 || year % 400 == 0) {
+	                        this.setDateCount(29);
+	                        if (this.state.date > 29) {
+	                            this.setDateNum(29);
+	                        }
+	                    } else {
+	                        this.setDateCount(28);
+	                        if (this.state.date > 28) {
+	                            this.setDateNum(28);
+	                        }
+	                    }
+	                }
+	            } else if (type == 'year') {
+	                if (month == 2) {
+	                    if (year % 4 == 0 && year % 100 != 0 || year % 400 == 0) {
+	                        this.setDateCount(29);
+	                        if (this.state.date > 29) {
+	                            this.setDateNum(29);
+	                        }
+	                    } else {
+	                        this.setDateCount(28);
+	                        if (this.state.date > 28) {
+	                            this.setDateNum(28);
+	                        }
+	                    }
+	                }
+	            }
+	        }
+	    }, {
+	        key: 'setDateCount',
+	        value: function setDateCount(cnt) {
+	            var dates = [];
+	            for (var i = 1; i <= cnt; i++) {
+	                dates.push('<div class="time-item-content">' + this.addZero(i) + '日</div>');
+	            }
+	            this.refs.dateItem.innerHTML = dates.join('');
+	        }
+	    }, {
+	        key: 'setDateNum',
+	        value: function setDateNum(date) {
+	            var y = itemHeight * (4 - date);
+	            this.moveElement(this.refs.dateItem, 0, y);
+	            this.setState({
+	                moveYDate: y,
+	                date: date
 	            });
 	        }
 	    }, {
