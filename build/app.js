@@ -207,8 +207,8 @@
 	        var _this = _possibleConstructorReturn(this, (TimePicker.__proto__ || Object.getPrototypeOf(TimePicker)).call(this, props));
 
 	        _this.state = {
-	            curItem: null,
-	            curType: null,
+	            curItem: null, //当前touch的item
+	            curType: null, //当前touch的data-type:year month date hour minute 
 	            touchStartY: 0,
 	            touchStartTime: 0,
 	            touchMoveY: 0, //记录每一帧touchMove的y坐标
@@ -216,11 +216,8 @@
 
 	            touchMoveTime: 0, //每帧touchMove事件的时间戳
 
-	            touching: false,
-	            objTranslate: {
-	                y: 0
-	            },
-	            objBounding: {
+	            touching: false, //是否触摸ing
+	            objBounding: { //正在触摸的滑块
 	                left: 0,
 	                right: 0,
 	                top: 0,
@@ -228,7 +225,7 @@
 	                width: 0,
 	                height: 0
 	            },
-	            containerBounding: {
+	            containerBounding: { //time-item的范围
 	                left: 0,
 	                right: 0,
 	                top: 0,
@@ -238,20 +235,19 @@
 	            },
 	            moveY: 0, //move过程中的transform-y的值
 	            inertia: false, //是否处于惯性状态
-	            moveYYear: 0,
-	            moveYMonth: 0,
-	            moveYDate: 0,
-	            moveYHour: 0,
-	            moveYMinute: 0,
+	            moveYYear: 0, //年份transform-y
+	            moveYMonth: 0, //月份transform-y
+	            moveYDate: 0, //日期transform-y
+	            moveYHour: 0, //小时transform-y
+	            moveYMinute: 0, //分钟transform-y
 
-	            year: 0,
-	            month: 0,
-	            date: 0,
-	            hour: 0,
-	            minute: 0,
+	            year: 0, //当前时间的年
+	            month: 0, //当前时间的月
+	            date: 0, //当前时间的日
+	            hour: 0, //当前时间的小时
+	            minute: 0, //当前时间的分钟
 
-	            ansTime: ''
-	        };
+	            ansTime: '' };
 	        return _this;
 	    }
 
