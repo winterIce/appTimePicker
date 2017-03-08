@@ -15,7 +15,7 @@ html, body {
 	right: 0;
 	z-index: 1;
 	background: #000;
-    opacity: 0.3;
+    opacity: 0.6;
 }
 .time-picker-container {
 	display: -webkit-box;
@@ -27,6 +27,7 @@ html, body {
 	z-index: 2;
 	top: 50%;
 	margin-top: -119px;
+	background: #fff;
 }
 .time-item-container {
 	-webkit-box-flex: 1;

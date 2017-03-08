@@ -85,16 +85,19 @@ export default class TimePicker extends Component {
     componentWillMount() {
         var d = new Date();
         this.setState({
-            year: d.getFullYear(),
-            month: d.getMonth() + 1,
-            date: d.getDate(),
-            hour: d.getHours(),
-            minute: d.getMinutes(),
+            year: this.props.year || d.getFullYear(),
+            month: this.props.month || d.getMonth() + 1,
+            date: this.props.date || d.getDate(),
+            hour: this.props.hour || d.getHours(),
+            minute: this.props.minute || d.getMinutes(),
         });
     }
 	componentDidMount() {
         var that = this;
         that.init();
+        this.refs.shadowLayer.addEventListener('touchstart', function(event) {
+            event.preventDefault();
+        });
         var eleArr = [];
         eleArr.push(that.refs.yearItemMask);
         eleArr.push(that.refs.monthItemMask);
@@ -553,7 +556,7 @@ export default class TimePicker extends Component {
 	render() {
 		return(
             <div>
-                <div className="shadow-layer"></div>
+                <div className="shadow-layer" ref="shadowLayer"></div>
     			<div className="time-picker-container">
                     <div className="operate-container">
                         <div ref="okBtn" className="operate-btn" onClick={this.props.cancelHandler.bind(this)}>取消</div>
