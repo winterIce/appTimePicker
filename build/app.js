@@ -234,7 +234,11 @@
 	                height: 0
 	            },
 	            moveY: 0, //move过程中的transform-y的值
-	            inertia: false, //是否处于惯性状态
+	            inertiaYear: false, //年份惯性状态
+	            inertiaMonth: false, //月份惯性状态
+	            inertiaDate: false, //日期惯性状态
+	            inertiaHour: false, //小时惯性状态
+	            inertiaMinute: false, //分钟惯性状态
 	            moveYYear: 0, //年份transform-y
 	            moveYMonth: 0, //月份transform-y
 	            moveYDate: 0, //日期transform-y
@@ -423,28 +427,32 @@
 
 	                that.setState({
 	                    touching: false,
-	                    touchEndTime: +new Date(),
-	                    inertia: true
+	                    touchEndTime: +new Date()
 	                });
 	                if (that.state.curType == 'year') {
 	                    that.setState({
-	                        moveYYear: that.state.moveY
+	                        moveYYear: that.state.moveY,
+	                        inertiaYear: true
 	                    });
 	                } else if (that.state.curType == 'month') {
 	                    that.setState({
-	                        moveYMonth: that.state.moveY
+	                        moveYMonth: that.state.moveY,
+	                        inertiaMonth: true
 	                    });
 	                } else if (that.state.curType == 'date') {
 	                    that.setState({
-	                        moveYDate: that.state.moveY
+	                        moveYDate: that.state.moveY,
+	                        inertiaDate: true
 	                    });
 	                } else if (that.state.curType == 'hour') {
 	                    that.setState({
-	                        moveYHour: that.state.moveY
+	                        moveYHour: that.state.moveY,
+	                        inertiaHour: true
 	                    });
 	                } else if (that.state.curType == 'minute') {
 	                    that.setState({
-	                        moveYMinute: that.state.moveY
+	                        moveYMinute: that.state.moveY,
+	                        inertiaMinute: true
 	                    });
 	                }
 
@@ -458,62 +466,7 @@
 	                var speed = moveY / time * 16.666; //矢量有+-
 	                var rate = Math.min(10, Math.abs(speed)); //加速度a
 
-	                var slide = function slide() {
-	                    if (that.state.touching) {
-	                        that.setState({
-	                            inertia: false
-	                        });
-	                        return;
-	                    }
-	                    if (!that.state.inertia) {
-	                        return;
-	                    }
-	                    speed = speed - speed / rate;
-
-	                    if (that.state.curType == 'year') {
-	                        var y = that.state.moveYYear + speed;
-	                        that.moveElement(that.state.curItem, 0, y);
-	                        that.setState({
-	                            moveYYear: y
-	                        });
-	                    } else if (that.state.curType == 'month') {
-	                        var y = that.state.moveYMonth + speed;
-	                        that.moveElement(that.state.curItem, 0, y);
-	                        that.setState({
-	                            moveYMonth: y
-	                        });
-	                    } else if (that.state.curType == 'date') {
-	                        var y = that.state.moveYDate + speed;
-	                        that.moveElement(that.state.curItem, 0, y);
-	                        that.setState({
-	                            moveYDate: y
-	                        });
-	                    } else if (that.state.curType == 'hour') {
-	                        var y = that.state.moveYHour + speed;
-	                        that.moveElement(that.state.curItem, 0, y);
-	                        that.setState({
-	                            moveYHour: y
-	                        });
-	                    } else if (that.state.curType == 'minute') {
-	                        var y = that.state.moveYMinute + speed;
-	                        that.moveElement(that.state.curItem, 0, y);
-	                        that.setState({
-	                            moveYMinute: y
-	                        });
-	                    }
-
-	                    if (Math.abs(speed) < 0.5) {
-	                        speed = 0;
-	                        that.setState({
-	                            inertia: false
-	                        });
-	                        that.inBox(that.state.curItem);
-	                    } else {
-	                        requestAnimationFrame(slide);
-	                    }
-	                };
-
-	                slide();
+	                that.slide(that.state.curItem, speed, rate);
 	            });
 
 	            //初始化时间
@@ -523,6 +476,111 @@
 	            });
 	        }
 	    }, {
+	        key: 'slide',
+	        value: function slide(ele, speed, rate) {
+	            var that = this;
+	            var type = ele.getAttribute('data-type');
+	            if (that.state.touching && type == that.state.curType) {
+	                if (type == 'year') {
+	                    that.setState({
+	                        inertiaYear: false
+	                    });
+	                } else if (type == 'month') {
+	                    that.setState({
+	                        inertiaMonth: false
+	                    });
+	                } else if (type == 'date') {
+	                    that.setState({
+	                        inertiaDate: false
+	                    });
+	                } else if (type == 'hour') {
+	                    that.setState({
+	                        inertiaHour: false
+	                    });
+	                } else if (type == 'minute') {
+	                    that.setState({
+	                        inertiaMinute: false
+	                    });
+	                }
+	                return;
+	            }
+
+	            if (type == 'year' && !that.state.inertiaYear) {
+	                return;
+	            } else if (type == 'month' && !that.state.inertiaMonth) {
+	                return;
+	            } else if (type == 'date' && !that.state.inertiaDate) {
+	                return;
+	            } else if (type == 'hour' && !that.state.inertiaHour) {
+	                return;
+	            } else if (type == 'minute' && !that.state.inertiaMinute) {
+	                return;
+	            }
+	            speed = speed - speed / rate;
+
+	            if (type == 'year') {
+	                var y = that.state.moveYYear + speed;
+	                that.moveElement(ele, 0, y);
+	                that.setState({
+	                    moveYYear: y
+	                });
+	            } else if (type == 'month') {
+	                var y = that.state.moveYMonth + speed;
+	                that.moveElement(ele, 0, y);
+	                that.setState({
+	                    moveYMonth: y
+	                });
+	            } else if (type == 'date') {
+	                var y = that.state.moveYDate + speed;
+	                that.moveElement(ele, 0, y);
+	                that.setState({
+	                    moveYDate: y
+	                });
+	            } else if (type == 'hour') {
+	                var y = that.state.moveYHour + speed;
+	                that.moveElement(ele, 0, y);
+	                that.setState({
+	                    moveYHour: y
+	                });
+	            } else if (type == 'minute') {
+	                var y = that.state.moveYMinute + speed;
+	                that.moveElement(ele, 0, y);
+	                that.setState({
+	                    moveYMinute: y
+	                });
+	            }
+
+	            if (Math.abs(speed) < 0.5) {
+	                speed = 0;
+	                if (type == 'year') {
+	                    that.setState({
+	                        inertiaYear: false
+	                    });
+	                } else if (type == 'month') {
+	                    that.setState({
+	                        inertiaMonth: false
+	                    });
+	                } else if (type == 'date') {
+	                    that.setState({
+	                        inertiaDate: false
+	                    });
+	                } else if (type == 'hour') {
+	                    that.setState({
+	                        inertiaHour: false
+	                    });
+	                } else if (type == 'minute') {
+	                    that.setState({
+	                        inertiaMinute: false
+	                    });
+	                }
+	                that.inBox(ele);
+	            } else {
+	                requestAnimationFrame(function () {
+	                    that.slide(ele, speed, rate);
+	                });
+	            }
+	        }
+	    }, {
 	        key: 'inBox',
 	        value: function inBox(ele) {
 	            var that = this;
@@ -530,15 +588,16 @@
 	            var minY = -(that.state.objBounding.height - 4 * itemHeight);
 	            var moveY = 0; //delta变化量
 	            var y = 0;
-	            if (that.state.curType == 'year') {
+	            var type = ele.getAttribute('data-type');
+	            if (type == 'year') {
 	                y = that.state.moveYYear;
-	            } else if (that.state.curType == 'month') {
+	            } else if (type == 'month') {
 	                y = that.state.moveYMonth;
-	            } else if (that.state.curType == 'date') {
+	            } else if (type == 'date') {
 	                y = that.state.moveYDate;
-	            } else if (that.state.curType == 'hour') {
+	            } else if (type == 'hour') {
 	                y = that.state.moveYHour;
-	            } else if (that.state.curType == 'minute') {
+	            } else if (type == 'minute') {
 	                y = that.state.moveYMinute;
 	            }
 
@@ -556,57 +615,117 @@
 	            var init = y;
 	            //变化量为0,不用动
 	            if (moveY == 0) {
-	                that.setState({
-	                    inertia: false
-	                });
+	                if (type == 'year') {
+	                    that.setState({
+	                        inertiaYear: false
+	                    });
+	                } else if (type == 'month') {
+	                    that.setState({
+	                        inertiaMonth: false
+	                    });
+	                } else if (type == 'date') {
+	                    that.setState({
+	                        inertiaDate: false
+	                    });
+	                } else if (type == 'hour') {
+	                    that.setState({
+	                        inertiaHour: false
+	                    });
+	                } else if (type == 'minute') {
+	                    that.setState({
+	                        inertiaMinute: false
+	                    });
+	                }
 	                that.calTime(init);
 	                return;
 	            }
 
-	            var run = function run() {
-	                if (that.state.touching) {
+	            that.adjust(ele, start, init, moveY, during);
+	        }
+	    }, {
+	        key: 'adjust',
+	        value: function adjust(ele, start, init, moveY, during) {
+	            var that = this;
+	            var type = ele.getAttribute('data-type');
+	            if (that.state.touching && type == that.state.curType) {
+	                if (type == 'year') {
 	                    that.setState({
-	                        inertia: false
+	                        inertiaYear: false
 	                    });
-	                    return;
-	                }
-
-	                start++;
-	                var y = that.easeOutQuad(start, init, moveY, during);
-	                that.moveElement(ele, 0, y);
-	                if (that.state.curType == 'year') {
+	                } else if (type == 'month') {
 	                    that.setState({
-	                        moveYYear: y
+	                        inertiaMonth: false
 	                    });
-	                } else if (that.state.curType == 'month') {
+	                } else if (type == 'date') {
 	                    that.setState({
-	                        moveYMonth: y
+	                        inertiaDate: false
 	                    });
-	                } else if (that.state.curType == 'date') {
+	                } else if (type == 'hour') {
 	                    that.setState({
-	                        moveYDate: y
+	                        inertiaHour: false
 	                    });
-	                } else if (that.state.curType == 'hour') {
+	                } else if (type == 'minute') {
 	                    that.setState({
-	                        moveYHour: y
-	                    });
-	                } else if (that.state.curType == 'minute') {
-	                    that.setState({
-	                        moveYMinute: y
+	                        inertiaMinute: false
 	                    });
 	                }
+	                return;
+	            }
 
-	                if (start < during) {
-	                    requestAnimationFrame(run);
-	                } else {
+	            start++;
+	            var y = that.easeOutQuad(start, init, moveY, during);
+	            that.moveElement(ele, 0, y);
+	            if (type == 'year') {
+	                that.setState({
+	                    moveYYear: y
+	                });
+	            } else if (type == 'month') {
+	                that.setState({
+	                    moveYMonth: y
+	                });
+	            } else if (type == 'date') {
+	                that.setState({
+	                    moveYDate: y
+	                });
+	            } else if (type == 'hour') {
+	                that.setState({
+	                    moveYHour: y
+	                });
+	            } else if (type == 'minute') {
+	                that.setState({
+	                    moveYMinute: y
+	                });
+	            }
+
+	            if (start < during) {
+	                requestAnimationFrame(function () {
+	                    that.adjust(ele, start, init, moveY, during);
+	                });
+	            } else {
+	                if (type == 'year') {
 	                    that.setState({
-	                        inertia: false
+	                        inertiaYear: false
 	                    });
-
-	                    that.calTime(y);
+	                } else if (type == 'month') {
+	                    that.setState({
+	                        inertiaMonth: false
+	                    });
+	                } else if (type == 'date') {
+	                    that.setState({
+	                        inertiaDate: false
+	                    });
+	                } else if (type == 'hour') {
+	                    that.setState({
+	                        inertiaHour: false
+	                    });
+	                } else if (type == 'minute') {
+	                    that.setState({
+	                        inertiaMinute: false
+	                    });
 	                }
-	            };
-	            run();
+
+	                that.calTime(y);
+	            }
 	        }
 	    }, {
 	        key: 'calTime',
