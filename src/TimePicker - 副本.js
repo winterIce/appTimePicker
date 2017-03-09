@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import { TimeItem } from './TimeItem';
-import { getDateNumByMonthYear } from './Util';
 import './main.css';
 
 const winWidth = window.innerWidth;
@@ -101,51 +100,11 @@ export default class TimePicker extends Component {
 	componentDidMount() {
         var that = this;
         that.init();
+        var yyear = new TimeItem(that.refs.yearItem, {});
+        yyear.init();
         this.refs.shadowLayer.addEventListener('touchstart', function(event) {
             event.preventDefault();
         });
-        //new年模块
-        var options = {
-            startNum: 2010,
-            endNum: 2020,
-            unit: '年',
-        }
-        var yearObj = new TimeItem(that.refs.yearItemMask, options);
-        yearObj.init();
-        //new月模块
-        options = {
-            startNum: 1,
-            endNum: 12,
-            unit: '月',
-        }
-        var monthObj = new TimeItem(that.refs.monthItemMask, options);
-        monthObj.init();
-        //new日模块
-        options = {
-            startNum: 1,
-            endNum: getDateNumByMonthYear(that.state.year, that.state.month),
-            unit: '日',
-        }
-        var dateObj = new TimeItem(that.refs.dateItemMask, options);
-        dateObj.init();
-        //new小时模块
-        options = {
-            startNum: 0,
-            endNum: 23,
-            unit: '时',
-        }
-        var hourObj = new TimeItem(that.refs.hourItemMask, options);
-        hourObj.init();
-        //new分钟模块
-        options = {
-            startNum: 0,
-            endNum: 59,
-            unit: '分',
-        }
-        var minuteObj = new TimeItem(that.refs.minuteItemMask, options);
-        minuteObj.init();
-
-
         var eleArr = [];
         eleArr.push(that.refs.yearItemMask);
         eleArr.push(that.refs.monthItemMask);
