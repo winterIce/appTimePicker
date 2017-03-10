@@ -6,6 +6,11 @@ import './main.css';
 const winWidth = window.innerWidth;
 const winHeight = window.innerHeight;
 const itemHeight = 34;
+var objTimeArr = [];
+var touchCurItem = null;
+var touchMoveY = null;
+var touchMoveTime = null;
+var touchEndTime = null;
 export default class TimePicker extends Component {
 	constructor(props) {
 		super(props);
@@ -20,14 +25,7 @@ export default class TimePicker extends Component {
             touchMoveTime: 0,//每帧touchMove事件的时间戳
 
             touching: false,//是否触摸ing
-            objBounding: {//正在触摸的滑块
-            	left: 0,
-            	right: 0,
-            	top: 0,
-            	bottom: 0,
-            	width: 0,
-            	height: 0,
-            },
+
             containerBounding: {//time-item的范围
                 left: 0,
                 right: 0,
@@ -57,37 +55,7 @@ export default class TimePicker extends Component {
             ansTime: '',//当前时间字符串 2017-03-08 09:00
 		};
 	}
-    init() {
-        var years = [];
-        for(var i = 2010; i <= 2020; i++) {
-            years.push('<div class="time-item-content">' + i + '年</div>');
-        }
-        this.refs.yearItem.innerHTML = years.join('');
 
-        var months = [];
-        for(i = 1; i <= 12; i++) {
-            months.push('<div class="time-item-content">' + this.addZero(i) + '月</div>');
-        }
-        this.refs.monthItem.innerHTML = months.join('');
-
-        var dates = [];
-        for(i = 1; i <= 31; i++) {
-            dates.push('<div class="time-item-content">' + this.addZero(i) + '日</div>');
-        }
-        this.refs.dateItem.innerHTML = dates.join('');
-
-        var hours = [];
-        for(i = 0; i <= 23; i++) {
-            hours.push('<div class="time-item-content">' + this.addZero(i) + '时</div>');
-        }
-        this.refs.hourItem.innerHTML = hours.join('');
-
-        var minutes = [];
-        for(i = 0; i <= 59; i++) {
-            minutes.push('<div class="time-item-content">' + this.addZero(i) + '分</div>');
-        }
-        this.refs.minuteItem.innerHTML = minutes.join('');
-    }
     componentWillMount() {
         var d = new Date();
         this.setState({
@@ -104,38 +72,66 @@ export default class TimePicker extends Component {
         this.refs.shadowLayer.addEventListener('touchstart', function(event) {
             event.preventDefault();
         });
+        //初始化外层容器的bouding
+        var containerRect = this.refs.yearItemMask.parentNode.getBoundingClientRect();
+        that.setState({
+            containerBounding: {
+                left: containerRect.left,
+                right: containerRect.right,
+                top: containerRect.top,
+                bottom: containerRect.bottom,
+                width: containerRect.width,
+                height: containerRect.height,
+            }
+        });
         //new年模块
         var options = {
             startNum: 2010,
             endNum: 2020,
             unit: '年',
+            touchStartCallback: function(item) {
+                touchCurItem = item;
+            }
         }
         var yearObj = new TimeItem(that.refs.yearItemMask, options);
-        yearObj.init();
+        yearObj.init(that.state.year);
+        objTimeArr.push(yearObj);
         //new月模块
         options = {
             startNum: 1,
             endNum: 12,
             unit: '月',
+            touchStartCallback: function(item) {
+                touchCurItem = item;
+            }
         }
         var monthObj = new TimeItem(that.refs.monthItemMask, options);
-        monthObj.init();
+        monthObj.init(that.state.month);
+        objTimeArr.push(monthObj);
         //new日模块
         options = {
             startNum: 1,
             endNum: getDateNumByMonthYear(that.state.year, that.state.month),
             unit: '日',
+            touchStartCallback: function(item) {
+                touchCurItem = item;
+            }
         }
         var dateObj = new TimeItem(that.refs.dateItemMask, options);
-        dateObj.init();
+        dateObj.init(that.state.date);
+        objTimeArr.push(dateObj);
         //new小时模块
         options = {
             startNum: 0,
             endNum: 23,
             unit: '时',
+            touchStartCallback: function(item) {
+                touchCurItem = item;
+            }
         }
         var hourObj = new TimeItem(that.refs.hourItemMask, options);
-        hourObj.init();
+        hourObj.init(that.state.hour);
+        objTimeArr.push(hourObj);
         //new分钟模块
         options = {
             startNum: 0,
@@ -143,170 +139,44 @@ export default class TimePicker extends Component {
             unit: '分',
         }
         var minuteObj = new TimeItem(that.refs.minuteItemMask, options);
-        minuteObj.init();
-
-
-        var eleArr = [];
-        eleArr.push(that.refs.yearItemMask);
-        eleArr.push(that.refs.monthItemMask);
-        eleArr.push(that.refs.dateItemMask);
-        eleArr.push(that.refs.hourItemMask);
-        eleArr.push(that.refs.minuteItemMask);
-        eleArr.forEach(function(item) {
-            var itemContent = item.nextSibling.nextSibling;
-            var type = itemContent.getAttribute('data-type');
-            var y = 0;
-            if(type == 'year') {
-                y = itemHeight * (2013 - that.state.year);
-                that.moveElement(itemContent, 0, y);
-                that.setState({
-                    moveYYear: y,
-                });
-            }
-            else if(type == 'month') {
-                y = itemHeight * (4 - that.state.month);
-                that.moveElement(itemContent, 0, y);   
-                that.setState({
-                    moveYMonth: y,
-                });
-            }
-            else if(type == 'date') {
-                y = itemHeight * (4 - that.state.date);
-                that.moveElement(itemContent, 0, y);
-                that.setState({
-                    moveYDate: y,
-                }); 
-            }
-            else if(type == 'hour') {
-                y = itemHeight * (3 - that.state.hour);
-                that.moveElement(itemContent, 0, y);
-                that.setState({
-                    moveYHour: y,
-                });
-            }
-            else if(type == 'minute') {
-                y = itemHeight * (3 - that.state.minute);
-                that.moveElement(itemContent, 0, y);
-                that.setState({
-                    moveYMinute: y,
-                });  
-            }
-
-            item.addEventListener('touchstart', function(event) {
-                event.preventDefault();
-                var evt = event.touches[0] || event;
-                var rect = itemContent.getBoundingClientRect();
-
-                var container = itemContent.parentNode;
-                var containerRect = container.getBoundingClientRect();
-
-                that.setState({
-                    curItem: itemContent,
-                    curType: itemContent.getAttribute('data-type'),
-                    touchStartY: evt.pageY,
-                    touchStartTime: +new Date(),
-                    touching: true,
-                    objBounding: {
-                        left: rect.left,
-                        right: rect.right,
-                        top: rect.top,
-                        bottom: rect.bottom,
-                        width: rect.width,
-                        height: rect.height,
-                    },
-                    containerBounding: {
-                        left: containerRect.left,
-                        right: containerRect.right,
-                        top: containerRect.top,
-                        bottom: containerRect.bottom,
-                        width: containerRect.width,
-                        height: containerRect.height,
-                    }
-                });
-            });
-        });
+        minuteObj.init(that.state.minute);
+        objTimeArr.push(minuteObj);
 
         document.addEventListener('touchmove', function(event) {
-            if(!that.state.touching) {
-            	return;
+            if(touchCurItem == null) {
+                return;
             }
+            
             event.preventDefault();
             var evt = event.touches[0] || event;
-            that.setState({
-                touchMoveY: evt.pageY,
-                touchMoveTime: +new Date(),
-            });
             
-            var moveY = evt.pageY - that.state.touchStartY;
-            var tempY = 0;
-            if(that.state.curType == 'year') {
-                tempY = that.state.moveYYear + moveY;
-            }
-            else if(that.state.curType == 'month') {
-                tempY = that.state.moveYMonth + moveY;
-            }
-            else if(that.state.curType == 'date') {
-                tempY = that.state.moveYDate + moveY;
-            }
-            else if(that.state.curType == 'hour') {
-                tempY = that.state.moveYHour + moveY;
-            }
-            else if(that.state.curType == 'minute') {
-                tempY = that.state.moveYMinute + moveY;
-            }
+            touchMoveY = evt.pageY;
+            touchMoveTime = +new Date();
+            
+            var moveY = evt.pageY - touchCurItem.getTouchStartY();
+            var tempY = touchCurItem.getMoveY() + moveY;
 
             if(tempY > itemHeight * 6) {
                 tempY = itemHeight * 6;
             }
-            if(tempY < -(that.state.objBounding.height - itemHeight) ) {
-                tempY = -(that.state.objBounding.height - itemHeight);
+            if(tempY < -(touchCurItem.getObjBounding().height - itemHeight) ) {
+                tempY = -(touchCurItem.getObjBounding().height - itemHeight);
             }
-            that.moveElement(that.state.curItem, 0, tempY);
+            touchCurItem.moveElement(0, tempY);
         });
         
         document.addEventListener('touchend', function(event) {
-            if(!that.state.touching) {
+            if(touchCurItem == null) {
                 return;
             }
+            touchCurItem = null;
             event.preventDefault();
             var evt = event.touches[0] || event;
-            
-            that.setState({
-        	    touching: false,
-                touchEndTime: +new Date(),
-            });
-            if(that.state.curType == 'year') {
-                that.setState({
-                    moveYYear: that.state.moveY,
-                    inertiaYear: true,
-                });
-            }
-            else if(that.state.curType == 'month') {
-                that.setState({
-                    moveYMonth: that.state.moveY,
-                    inertiaMonth: true,
-                });
-            }
-            else if(that.state.curType == 'date') {
-                that.setState({
-                    moveYDate: that.state.moveY,
-                    inertiaDate: true,
-                });
-            }
-            else if(that.state.curType == 'hour') {
-                that.setState({
-                    moveYHour: that.state.moveY,
-                    inertiaHour: true,
-                });
-            }
-            else if(that.state.curType == 'minute') {
-                that.setState({
-                    moveYMinute: that.state.moveY,
-                    inertiaMinute: true,
-                });
-            }
+            touchEndTime = +new Date();
+            touchCurItem.setMoveY();
+            touchCurItem.setInertia(true);
 
-            that.inBox(that.state.curItem);
+            that.inBox();
             //最后一次touchMoveTime和touchEndTime之间超过30ms,意味着停留了长时间,不做滑动
             if(that.state.touchEndTime - that.state.touchMoveTime > 30) {
                 return;
