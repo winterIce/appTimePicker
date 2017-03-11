@@ -158,6 +158,7 @@ TimeItem.prototype = {
         this.calTimeCallback(this.timeVal);
     }
 }
+
 function addZero(n) {
     if(n < 10) {
         return '0' + n;
