@@ -157,6 +157,13 @@ TimeItem.prototype = {
         this.timeVal = this.options.startNum + this.offset - y / this.itemHeight;
         this.calTimeCallback(this.timeVal);
     }
+
+    setDateCount: function(cnt) {
+
+    }
+    setDateNum: function(date) {
+
+    }
 }
 
 function addZero(n) {
