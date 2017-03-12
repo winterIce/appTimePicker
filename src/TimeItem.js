@@ -14,18 +14,18 @@ function TimeItem(element, options) {
     this.touching = false;//是否正在触摸当前滑块
     this.touchStartY = 0;//开始触摸时的transformY
     this.touchStartTime = 0;//开始触摸的时间
-    this.touchStartCallback = function() {
-
-    };//触摸开始时的回调函数
     this.inertia = false;
-    this.calTimeCallback = function() {
-
-    };//计算时间的回调函数
 }
 TimeItem.defaults = {
     startNum: '',
     endNum: '',
     unit: '',
+    touchStartCallback: function() {
+
+    },//触摸开始时的回调函数
+    calTimeCallback: function() {
+
+    },//计算时间的回调函数
 };
 TimeItem.prototype = {
     init: function(timeVal) {
@@ -78,7 +78,7 @@ TimeItem.prototype = {
             that.touching = true;
             that.touchStartY = evt.pageY;
             that.touchStartTime = +new Date();
-            that.touchStartCallback(that);
+            that.options.touchStartCallback(that);
         });
     },
     getTouchStartY: function() {
@@ -128,8 +128,8 @@ TimeItem.prototype = {
     },
 
     inBox: function() {
-        var maxY = 3 * itemHeight;
-        var minY = -(this.objBounding.height - 4 * itemHeight);
+        var maxY = 3 * this.itemHeight;
+        var minY = -(this.objBounding.height - 4 * this.itemHeight);
         var delta = 0; //delta变化量
         var y = this.moveY;
 
@@ -141,7 +141,7 @@ TimeItem.prototype = {
         }
         else {
             //调整位置,使时间块位于中间
-            delta = Math.ceil(y / itemHeight) * itemHeight - y;
+            delta = Math.ceil(y / this.itemHeight) * this.itemHeight - y;
         }
 
         var start = 0;
@@ -183,7 +183,7 @@ TimeItem.prototype = {
     calTime: function(y) {
         this.moveY = y;
         this.timeVal = this.options.startNum + this.offset - y / this.itemHeight;
-        this.calTimeCallback(this.timeVal);
+        this.options.calTimeCallback(this.timeVal);
     },
 
     setTimeCount: function(cnt) {

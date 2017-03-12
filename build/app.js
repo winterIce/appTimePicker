@@ -371,7 +371,7 @@
 	                if (touchCurItem == null) {
 	                    return;
 	                }
-	                touchCurItem = null;
+	                //touchCurItem = null;
 	                event.preventDefault();
 	                var evt = event.touches[0] || event;
 	                touchEndTime = +new Date();
@@ -381,6 +381,7 @@
 	                touchCurItem.inBox();
 	                //最后一次touchMoveTime和touchEndTime之间超过30ms,意味着停留了长时间,不做滑动
 	                if (touchEndTime - touchMoveTime > 30) {
+	                    touchCurItem = null;
 	                    return;
 	                }
 	                var moveY = touchMoveY - touchCurItem.getTouchStartY(); //矢量有+-
@@ -389,6 +390,7 @@
 	                var rate = Math.min(10, Math.abs(speed)); //加速度a
 
 	                touchCurItem.slide(speed, rate);
+	                touchCurItem = null;
 	            });
 	        }
 	    }, {
@@ -545,15 +547,14 @@
 	    this.touching = false; //是否正在触摸当前滑块
 	    this.touchStartY = 0; //开始触摸时的transformY
 	    this.touchStartTime = 0; //开始触摸的时间
-	    this.touchStartCallback = function () {}; //触摸开始时的回调函数
 	    this.inertia = false;
-	    this.calTimeCallback = function () {}; //计算时间的回调函数
 	}
 	TimeItem.defaults = {
 	    startNum: '',
 	    endNum: '',
-	    unit: ''
-	};
+	    unit: '',
+	    touchStartCallback: function touchStartCallback() {}, //触摸开始时的回调函数
+	    calTimeCallback: function calTimeCallback() {} };
 	TimeItem.prototype = {
 	    init: function init(timeVal) {
 	        this.timeVal = timeVal;
@@ -606,7 +607,7 @@
 	            that.touching = true;
 	            that.touchStartY = evt.pageY;
 	            that.touchStartTime = +new Date();
-	            that.touchStartCallback(that);
+	            that.options.touchStartCallback(that);
 	        });
 	    },
 	    getTouchStartY: function getTouchStartY() {
@@ -657,8 +658,8 @@
 
 
 	    inBox: function inBox() {
-	        var maxY = 3 * itemHeight;
-	        var minY = -(this.objBounding.height - 4 * itemHeight);
+	        var maxY = 3 * this.itemHeight;
+	        var minY = -(this.objBounding.height - 4 * this.itemHeight);
 	        var delta = 0; //delta变化量
 	        var y = this.moveY;
 
@@ -668,7 +669,7 @@
 	            delta = minY - y;
 	        } else {
 	            //调整位置,使时间块位于中间
-	            delta = Math.ceil(y / itemHeight) * itemHeight - y;
+	            delta = Math.ceil(y / this.itemHeight) * this.itemHeight - y;
 	        }
 
 	        var start = 0;
@@ -710,7 +711,7 @@
 	    calTime: function calTime(y) {
 	        this.moveY = y;
 	        this.timeVal = this.options.startNum + this.offset - y / this.itemHeight;
-	        this.calTimeCallback(this.timeVal);
+	        this.options.calTimeCallback(this.timeVal);
 	    },
 
 	    setTimeCount: function setTimeCount(cnt) {

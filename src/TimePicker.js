@@ -161,7 +161,7 @@ export default class TimePicker extends Component {
             if(touchCurItem == null) {
                 return;
             }
-            touchCurItem = null;
+            //touchCurItem = null;
             event.preventDefault();
             var evt = event.touches[0] || event;
             touchEndTime = +new Date();
@@ -171,6 +171,7 @@ export default class TimePicker extends Component {
             touchCurItem.inBox();
             //最后一次touchMoveTime和touchEndTime之间超过30ms,意味着停留了长时间,不做滑动
             if(touchEndTime - touchMoveTime > 30) {
+                touchCurItem = null;
                 return;
             }
             var moveY = touchMoveY - touchCurItem.getTouchStartY(); //矢量有+-
@@ -179,6 +180,7 @@ export default class TimePicker extends Component {
             var rate = Math.min(10, Math.abs(speed)); //加速度a
 
             touchCurItem.slide(speed, rate);
+            touchCurItem = null;
         });
 	}
     calTimeCallback() {
