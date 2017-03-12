@@ -33,34 +33,32 @@ TimeItem.prototype = {
     	this.timeMask = this.element;
     	this.timeContainer = this.element.nextSibling.nextSibling;
         this.parentContainer = this.element.parentNode;
-    	this.options = Object.assign({}, TimeItem.defaults, this.options);
+    	//this.options = Object.assign({}, TimeItem.defaults, this.options);
     	this.renderHtml();
-        this.initTranslate();
+        this.setTranslate();
         this.calBounding();
         this.touchStartEvt();
     	console.log('====init done====');
-    }
+    },
     renderHtml: function() {
-    	var that = this;
-    	var content = [];
-        for(var i = that.options.startNum; i <= that.options.endNum; i++) {
-            content.push('<div class="time-item-content">' + addZero(i) + that.options.unit + '</div>');
-        }
-        that.options.timeContainer.innerHTML = content.join('');
-    }
-    initTranslate: function() {
+        this.setTimeCount(this.options.endNum);
+    },
+    setTimeVal(val) {
+        this.timeVal = val;
+    },
+    setTranslate: function() {
         var y = this.itemHeight * (this.options.startNum + this.offset - this.timeVal);
         this.moveElement(0, y);
         this.moveY = y;
-    }
+    },
     moveElement: function(x, y) {
         var x = Math.round(1000 * x) / 1000;
         var y = Math.round(1000 * y) / 1000;
 
-        this.options.timeContainer.style.webkitTransform = 'translate(' + x + 'px,' + y + 'px)';
-        this.options.timeContainer.style.transform = 'translate3d(' + x + 'px,' + y + 'px, 0)';
+        this.timeContainer.style.webkitTransform = 'translate(' + x + 'px,' + y + 'px)';
+        this.timeContainer.style.transform = 'translate3d(' + x + 'px,' + y + 'px, 0)';
         this.transformY = y;
-    }
+    },
     calBounding: function() {
         var rect = this.timeContainer.getBoundingClientRect();
         this.objBounding = {
@@ -71,7 +69,7 @@ TimeItem.prototype = {
             width: rect.width,
             height: rect.height,
         }
-    }
+    },
     touchStartEvt: function() {
         var that = this;
         this.timeMask.addEventListener('touchstart', function(event) {
@@ -82,22 +80,52 @@ TimeItem.prototype = {
             that.touchStartTime = +new Date();
             that.touchStartCallback(that);
         });
-    }
+    },
     getTouchStartY: function() {
         return this.touchStartY;
-    }
+    },
+    getTouchStartTime: function() {
+        return this.touchStartTime;
+    },
     getMoveY: function() {
         return this.moveY;
-    }
+    },
     setMoveY: function() {
         this.moveY = this.transformY;
-    }
+    },
     getObjBounding: function() {
         return this.objBounding;
-    }
+    },
     setInertia: function(inertia) {
         this.inertia = inertia;
-    }
+    },
+    
+    slide(speed, rate) {
+        var that = this;
+        if (this.touching) {
+            this.inertia = false;
+            return;
+        }
+        if(!this.inertia) {
+            return;
+        }
+        
+        speed = speed - speed / rate;
+        
+        var y = this.moveY + speed;
+        this.moveElement(0, y);
+        this.moveY = y;
+
+        if (Math.abs(speed) < 0.5) {
+            speed = 0;
+            this.inertia = false;
+            this.inBox();
+        } else {
+            requestAnimationFrame(function() {
+                that.slide(speed, rate);
+            });
+        }
+    },
 
     inBox: function() {
         var maxY = 3 * itemHeight;
@@ -128,7 +156,7 @@ TimeItem.prototype = {
         }
 
         this.adjust(start, init, delta, during);
-    }
+    },
 
     adjust: function(start, init, delta, during) {
         var that = this;
@@ -150,20 +178,22 @@ TimeItem.prototype = {
             this.inertia = false;
             this.calTime(y);
         }
-    }
+    },
 
     calTime: function(y) {
         this.moveY = y;
         this.timeVal = this.options.startNum + this.offset - y / this.itemHeight;
         this.calTimeCallback(this.timeVal);
-    }
+    },
 
-    setDateCount: function(cnt) {
-
-    }
-    setDateNum: function(date) {
-
-    }
+    setTimeCount: function(cnt) {
+        var content = [];
+        this.options.endNum = cnt;
+        for(var i = this.options.startNum; i <= this.options.endNum; i++) {
+            content.push('<div class="time-item-content">' + addZero(i) + this.options.unit + '</div>');
+        }
+        this.timeContainer.innerHTML = content.join('');
+    },
 }
 
 function addZero(n) {
