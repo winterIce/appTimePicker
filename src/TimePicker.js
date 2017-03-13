@@ -165,6 +165,7 @@ export default class TimePicker extends Component {
             event.preventDefault();
             var evt = event.touches[0] || event;
             touchEndTime = +new Date();
+            touchCurItem.setTouching(false);
             touchCurItem.setMoveY();
             touchCurItem.setInertia(true);
 

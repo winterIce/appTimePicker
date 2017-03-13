@@ -375,6 +375,7 @@
 	                event.preventDefault();
 	                var evt = event.touches[0] || event;
 	                touchEndTime = +new Date();
+	                touchCurItem.setTouching(false);
 	                touchCurItem.setMoveY();
 	                touchCurItem.setInertia(true);
 
@@ -561,12 +562,10 @@
 	        this.timeMask = this.element;
 	        this.timeContainer = this.element.nextSibling.nextSibling;
 	        this.parentContainer = this.element.parentNode;
-	        //this.options = Object.assign({}, TimeItem.defaults, this.options);
+	        //this.options = Object.assign({}, TimeItem.defaults, this.options);//支持es6的浏览器才能用
 	        this.renderHtml();
 	        this.setTranslate();
-	        this.calBounding();
 	        this.touchStartEvt();
-	        console.log('====init done====');
 	    },
 	    renderHtml: function renderHtml() {
 	        this.setTimeCount(this.options.endNum);
@@ -588,6 +587,9 @@
 	        this.timeContainer.style.transform = 'translate3d(' + x + 'px,' + y + 'px, 0)';
 	        this.transformY = y;
 	    },
+	    setTouching: function setTouching(touching) {
+	        this.touching = touching;
+	    },
 	    calBounding: function calBounding() {
 	        var rect = this.timeContainer.getBoundingClientRect();
 	        this.objBounding = {
@@ -603,6 +605,7 @@
 	        var that = this;
 	        this.timeMask.addEventListener('touchstart', function (event) {
 	            event.preventDefault();
+	            that.calBounding();
 	            var evt = event.touches[0] || event;
 	            that.touching = true;
 	            that.touchStartY = evt.pageY;
