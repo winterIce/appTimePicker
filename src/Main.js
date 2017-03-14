@@ -37,7 +37,7 @@ export default class Main extends Component {
 	                <input ref="startTime" type="text" value={this.state.startTime} style={{width: '200px', height: '50px'}} />
 	            </div>
 	            <div ref="timeOuter" style={ this.state.showTime ? {} : {display: 'none'} }>
-                    <TimePicker okHandler={this.okHandler.bind(this)} cancelHandler={this.cancelHandler.bind(this)}  hour="8" minute="30" />
+                    <TimePicker okHandler={this.okHandler.bind(this)} cancelHandler={this.cancelHandler.bind(this)} hour="8" minute="30" />
 	            </div>
             </div>
 		)
