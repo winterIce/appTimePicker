@@ -6,16 +6,21 @@ import './main.css';
 const winWidth = window.innerWidth;
 const winHeight = window.innerHeight;
 const itemHeight = 34;
-var objTimeArr = [];
-var touchCurItem = null;
-var touchMoveY = null;//记录每一帧touchMove的y坐标
-var touchMoveTime = null;//每帧touchMove事件的时间戳
-var touchEndTime = null;//记录touchend的时间戳
-var year = 0, month = 0, date = 0, hour = 0, minute = 0;
-var ansTime = '';//当前时间字符串 2017-03-08 09:00
+
 export default class TimePicker extends Component {
 	constructor(props) {
 		super(props);
+        this.objTimeArr = [];
+        this.touchCurItem = null;
+        this.touchMoveY = null;//记录每一帧touchMove的y坐标
+        this.touchMoveTime = null;//每帧touchMove事件的时间戳
+        this.touchEndTime = null;//记录touchend的时间戳
+        this.year = 0;
+        this.month = 0
+        this.date = 0;
+        this.hour = 0;
+        this.minute = 0;
+        this.ansTime = '';//当前时间字符串 2017-03-08 09:00
 		this.state = {
             containerBounding: {//time-item的范围
                 left: 0,
@@ -30,11 +35,11 @@ export default class TimePicker extends Component {
 
     componentWillMount() {
         var d = new Date();
-        year = this.props.year || d.getFullYear();
-        month = this.props.month || d.getMonth() + 1;
-        date = this.props.date || d.getDate();
-        hour = this.props.hour || d.getHours();
-        minute = this.props.minute || d.getMinutes();
+        this.year = this.props.year || d.getFullYear();
+        this.month = this.props.month || d.getMonth() + 1;
+        this.date = this.props.date || d.getDate();
+        this.hour = this.props.hour || d.getHours();
+        this.minute = this.props.minute || d.getMinutes();
         this.setAnsTime();
     }
 	componentDidMount() {
@@ -60,167 +65,167 @@ export default class TimePicker extends Component {
             endNum: 2020,
             unit: '年',
             touchStartCallback: function(item) {
-                touchCurItem = item;
+                that.touchCurItem = item;
             },
             calTimeCallback: function(val) {
-                year = val;
+                that.year = val;
                 that.calTimeCallback();
             },
         }
         var yearObj = new TimeItem(that.refs.yearItemMask, options);
-        yearObj.init(year);
-        objTimeArr.push(yearObj);
+        yearObj.init(this.year);
+        this.objTimeArr.push(yearObj);
         //new月模块
         options = {
             startNum: 1,
             endNum: 12,
             unit: '月',
             touchStartCallback: function(item) {
-                touchCurItem = item;
+                that.touchCurItem = item;
             },
             calTimeCallback: function(val) {
-                month = val;
+                that.month = val;
                 that.calTimeCallback();
             },
         }
         var monthObj = new TimeItem(that.refs.monthItemMask, options);
-        monthObj.init(month);
-        objTimeArr.push(monthObj);
+        monthObj.init(this.month);
+        this.objTimeArr.push(monthObj);
         //new日模块
         options = {
             startNum: 1,
-            endNum: getDateNumByMonthYear(year, month),
+            endNum: getDateNumByMonthYear(this.year, this.month),
             unit: '日',
             touchStartCallback: function(item) {
-                touchCurItem = item;
+                that.touchCurItem = item;
             },
             calTimeCallback: function(val) {
-                date = val;
+                that.date = val;
                 that.setAnsTime();
             },
         }
         var dateObj = new TimeItem(that.refs.dateItemMask, options);
-        dateObj.init(date);
-        objTimeArr.push(dateObj);
+        dateObj.init(this.date);
+        this.objTimeArr.push(dateObj);
         //new小时模块
         options = {
             startNum: 0,
             endNum: 23,
             unit: '时',
             touchStartCallback: function(item) {
-                touchCurItem = item;
+                that.touchCurItem = item;
             },
             calTimeCallback: function(val) {
-                hour = val;
+                that.hour = val;
                 that.setAnsTime();
             },
         }
         var hourObj = new TimeItem(that.refs.hourItemMask, options);
-        hourObj.init(hour);
-        objTimeArr.push(hourObj);
+        hourObj.init(this.hour);
+        this.objTimeArr.push(hourObj);
         //new分钟模块
         options = {
             startNum: 0,
             endNum: 59,
             unit: '分',
             touchStartCallback: function(item) {
-                touchCurItem = item;
+                that.touchCurItem = item;
             },
             calTimeCallback: function(val) {
-                minute = val;
+                that.minute = val;
                 that.setAnsTime();
             },
         }
         var minuteObj = new TimeItem(that.refs.minuteItemMask, options);
-        minuteObj.init(minute);
-        objTimeArr.push(minuteObj);
+        minuteObj.init(this.minute);
+        this.objTimeArr.push(minuteObj);
 
         document.addEventListener('touchmove', function(event) {
-            if(touchCurItem == null) {
+            if(that.touchCurItem == null) {
                 return;
             }
             event.preventDefault();
             var evt = event.touches[0] || event;
             
-            touchMoveY = evt.pageY;
-            touchMoveTime = +new Date();
+            that.touchMoveY = evt.pageY;
+            that.touchMoveTime = +new Date();
             
-            var moveY = evt.pageY - touchCurItem.getTouchStartY();
-            var tempY = touchCurItem.getMoveY() + moveY;
+            var moveY = evt.pageY - that.touchCurItem.getTouchStartY();
+            var tempY = that.touchCurItem.getMoveY() + moveY;
 
             if(tempY > itemHeight * 6) {
                 tempY = itemHeight * 6;
             }
-            if(tempY < -(touchCurItem.getObjBounding().height - itemHeight) ) {
-                tempY = -(touchCurItem.getObjBounding().height - itemHeight);
+            if(tempY < -(that.touchCurItem.getObjBounding().height - itemHeight) ) {
+                tempY = -(that.touchCurItem.getObjBounding().height - itemHeight);
             }
-            touchCurItem.moveElement(0, tempY);
+            that.touchCurItem.moveElement(0, tempY);
         });
         
         document.addEventListener('touchend', function(event) {
-            if(touchCurItem == null) {
+            if(that.touchCurItem == null) {
                 return;
             }
-            //touchCurItem = null;
+            //that.touchCurItem = null;
             event.preventDefault();
             var evt = event.touches[0] || event;
-            touchEndTime = +new Date();
-            touchCurItem.setTouching(false);
-            touchCurItem.setMoveY();
-            touchCurItem.setInertia(true);
+            that.touchEndTime = +new Date();
+            that.touchCurItem.setTouching(false);
+            that.touchCurItem.setMoveY();
+            that.touchCurItem.setInertia(true);
 
-            touchCurItem.inBox();
+            that.touchCurItem.inBox();
             //最后一次touchMoveTime和touchEndTime之间超过30ms,意味着停留了长时间,不做滑动
-            if(touchEndTime - touchMoveTime > 30) {
-                touchCurItem = null;
+            if(that.touchEndTime - that.touchMoveTime > 30) {
+                that.touchCurItem = null;
                 return;
             }
-            var moveY = touchMoveY - touchCurItem.getTouchStartY(); //矢量有+-
-            var time = touchEndTime - touchCurItem.getTouchStartTime();
+            var moveY = that.touchMoveY - that.touchCurItem.getTouchStartY(); //矢量有+-
+            var time = that.touchEndTime - that.touchCurItem.getTouchStartTime();
             var speed = moveY / time * 16.666; //矢量有+-
             var rate = Math.min(20, Math.abs(speed)); //加速度a
 
-            touchCurItem.slide(speed, rate);
-            touchCurItem = null;
+            that.touchCurItem.slide(speed, rate);
+            that.touchCurItem = null;
         });
 	}
     calTimeCallback() {
-        if(month == 1 || month == 3 || month == 5 || month == 7 || month == 8 || month == 10 || month == 12) {
-            objTimeArr[2].setTimeCount(31);
+        if(this.month == 1 || this.month == 3 || this.month == 5 || this.month == 7 || this.month == 8 || this.month == 10 || this.month == 12) {
+            this.objTimeArr[2].setTimeCount(31);
         }
-        else if(month == 4 || month == 6 || month == 9 || month == 11) {
-            objTimeArr[2].setTimeCount(30);
-            if(date > 30) {
-                objTimeArr[2].setTimeVal(30);
-                objTimeArr[2].setTranslate();
+        else if(this.month == 4 || this.month == 6 || this.month == 9 || this.month == 11) {
+            this.objTimeArr[2].setTimeCount(30);
+            if(this.date > 30) {
+                this.objTimeArr[2].setTimeVal(30);
+                this.objTimeArr[2].setTranslate();
             }
         }
-        else if(month == 2){
-            if( (year % 4 == 0) && (year % 100 != 0) || (year % 400 == 0) ) {
-                objTimeArr[2].setTimeCount(29);
-                if(date > 29) {
-                    objTimeArr[2].setTimeVal(29);
-                    objTimeArr[2].setTranslate();
+        else if(this.month == 2){
+            if( (this.year % 4 == 0) && (this.year % 100 != 0) || (this.year % 400 == 0) ) {
+                this.objTimeArr[2].setTimeCount(29);
+                if(this.date > 29) {
+                    this.objTimeArr[2].setTimeVal(29);
+                    this.objTimeArr[2].setTranslate();
                 }
             }
             else {
-                objTimeArr[2].setTimeCount(28);
-                if(date > 28) {
-                    objTimeArr[2].setTimeVal(28);
-                    objTimeArr[2].setTranslate();
+                this.objTimeArr[2].setTimeCount(28);
+                if(this.date > 28) {
+                    this.objTimeArr[2].setTimeVal(28);
+                    this.objTimeArr[2].setTranslate();
                 }
             }
         }    
         this.setAnsTime();
     }
     setAnsTime() {
-        var time = year + '-' + addZero(month) + '-' + addZero(date) + ' ' + addZero(hour) + ':' + addZero(minute) + ':' + '00';
+        var time = this.year + '-' + addZero(this.month) + '-' + addZero(this.date) + ' ' + addZero(this.hour) + ':' + addZero(this.minute) + ':' + '00';
         console.log(time);
-        ansTime = time;
+        this.ansTime = time;
     }
 
     okHandler() {
-        this.props.okHandler(ansTime);
+        this.props.okHandler(this.ansTime);
     }
 
 	render() {
