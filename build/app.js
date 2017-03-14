@@ -388,7 +388,7 @@
 	                var moveY = touchMoveY - touchCurItem.getTouchStartY(); //矢量有+-
 	                var time = touchEndTime - touchCurItem.getTouchStartTime();
 	                var speed = moveY / time * 16.666; //矢量有+-
-	                var rate = Math.min(10, Math.abs(speed)); //加速度a
+	                var rate = Math.min(20, Math.abs(speed)); //加速度a
 
 	                touchCurItem.slide(speed, rate);
 	                touchCurItem = null;
