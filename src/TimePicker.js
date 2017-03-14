@@ -16,7 +16,7 @@ export default class TimePicker extends Component {
         this.touchMoveTime = null;//每帧touchMove事件的时间戳
         this.touchEndTime = null;//记录touchend的时间戳
         this.year = 0;
-        this.month = 0
+        this.month = 0;
         this.date = 0;
         this.hour = 0;
         this.minute = 0;
