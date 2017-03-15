@@ -14,7 +14,9 @@ function TimeItem(element, options) {
     this.touching = false;//是否正在触摸当前滑块
     this.touchStartY = 0;//开始触摸时的transformY
     this.touchStartTime = 0;//开始触摸的时间
-    this.inertia = false;
+    this.inertia = false;//是否惯性滑动
+    this.touchMoveEvtPageY = 0;//记录touchMove时evt.pageY
+    this.touchMoveUpDown = null;//touchMove是向上还是向下,1上2下
 }
 TimeItem.defaults = {
     startNum: '',
@@ -80,6 +82,8 @@ TimeItem.prototype = {
             var evt = event.touches[0] || event;
             that.touching = true;
             that.touchStartY = evt.pageY;
+            that.touchMoveEvtPageY = evt.pageY;//touchMove初始值
+            that.touchMoveUpDown = 0;//初始值为0
             that.touchStartTime = +new Date();
             that.options.touchStartCallback(that);
         });
@@ -95,6 +99,16 @@ TimeItem.prototype = {
     },
     setMoveY: function() {
         this.moveY = this.transformY;
+    },
+    setTouchMoveEvtPageY: function(y) {
+        if(y < this.touchMoveEvtPageY) {
+            this.touchMoveUpDown = 1;//向上滑
+        }
+        else {
+            this.touchMoveUpDown = 2;//向下滑
+        }
+        this.touchMoveEvtPageY = y;
+
     },
     getObjBounding: function() {
         return this.objBounding;
@@ -144,7 +158,12 @@ TimeItem.prototype = {
         }
         else {
             //调整位置,使时间块位于中间
-            delta = Math.ceil(y / this.itemHeight) * this.itemHeight - y;
+            if(this.touchMoveUpDown == 1) {
+                delta = Math.floor(y / this.itemHeight) * this.itemHeight - y;
+            }
+            else {
+                delta = Math.ceil(y / this.itemHeight) * this.itemHeight - y;    
+            }
         }
 
         var start = 0;
