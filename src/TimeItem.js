@@ -102,7 +102,7 @@ TimeItem.prototype = {
         this.inertia = inertia;
     },
     
-    slide(speed, rate) {
+    slide: function(speed, rate) {
         var that = this;
         if (this.touching) {
             this.inertia = false;

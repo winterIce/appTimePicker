@@ -659,7 +659,6 @@
 	        }
 	    },
 
-
 	    inBox: function inBox() {
 	        var maxY = 3 * this.itemHeight;
 	        var minY = -(this.objBounding.height - 4 * this.itemHeight);
