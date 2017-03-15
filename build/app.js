@@ -251,6 +251,7 @@
 	            var that = this;
 	            this.refs.shadowLayer.addEventListener('touchstart', function (event) {
 	                event.preventDefault();
+	                that.props.cancelHandler();
 	            });
 	            //初始化外层容器的bouding
 	            var containerRect = this.refs.yearItemMask.parentNode.getBoundingClientRect();
@@ -605,6 +606,7 @@
 	        var that = this;
 	        this.timeMask.addEventListener('touchstart', function (event) {
 	            event.preventDefault();
+	            event.stopPropagation();
 	            that.calBounding();
 	            var evt = event.touches[0] || event;
 	            that.touching = true;

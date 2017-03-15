@@ -46,6 +46,7 @@ export default class TimePicker extends Component {
         var that = this;
         this.refs.shadowLayer.addEventListener('touchstart', function(event) {
             event.preventDefault();
+            that.props.cancelHandler();
         });
         //初始化外层容器的bouding
         var containerRect = this.refs.yearItemMask.parentNode.getBoundingClientRect();

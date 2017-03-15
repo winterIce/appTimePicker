@@ -75,6 +75,7 @@ TimeItem.prototype = {
         var that = this;
         this.timeMask.addEventListener('touchstart', function(event) {
             event.preventDefault();
+            event.stopPropagation();
             that.calBounding();
             var evt = event.touches[0] || event;
             that.touching = true;
