@@ -104,7 +104,7 @@ TimeItem.prototype = {
         if(y < this.touchMoveEvtPageY) {
             this.touchMoveUpDown = 1;//向上滑
         }
-        else {
+        else if (y > this.touchMoveEvtPageY){
             this.touchMoveUpDown = 2;//向下滑
         }
         this.touchMoveEvtPageY = y;
@@ -126,7 +126,14 @@ TimeItem.prototype = {
         if(!this.inertia) {
             return;
         }
-        
+
+        if (Math.abs(speed) < 0.5) {
+            speed = 0;
+            this.inertia = false;
+            this.inBox();
+            return;
+        }
+
         speed = speed - speed / rate;
         
         var y = this.moveY + speed;
