@@ -409,6 +409,7 @@
 	                if (this.date > 30) {
 	                    this.objTimeArr[2].setTimeVal(30);
 	                    this.objTimeArr[2].setTranslate();
+	                    this.date = 30;
 	                }
 	            } else if (this.month == 2) {
 	                if (this.year % 4 == 0 && this.year % 100 != 0 || this.year % 400 == 0) {
@@ -416,12 +417,14 @@
 	                    if (this.date > 29) {
 	                        this.objTimeArr[2].setTimeVal(29);
 	                        this.objTimeArr[2].setTranslate();
+	                        this.date = 29;
 	                    }
 	                } else {
 	                    this.objTimeArr[2].setTimeCount(28);
 	                    if (this.date > 28) {
 	                        this.objTimeArr[2].setTimeVal(28);
 	                        this.objTimeArr[2].setTranslate();
+	                        this.date = 28;
 	                    }
 	                }
 	            }
