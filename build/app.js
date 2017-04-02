@@ -238,11 +238,11 @@
 	        key: 'componentWillMount',
 	        value: function componentWillMount() {
 	            var d = new Date();
-	            this.year = this.props.year || d.getFullYear();
-	            this.month = this.props.month || d.getMonth() + 1;
-	            this.date = this.props.date || d.getDate();
-	            this.hour = this.props.hour || d.getHours();
-	            this.minute = this.props.minute || d.getMinutes();
+	            this.year = parseInt(this.props.year) || d.getFullYear();
+	            this.month = parseInt(this.props.month) || d.getMonth() + 1;
+	            this.date = parseInt(this.props.date) || d.getDate();
+	            this.hour = parseInt(this.props.hour) || d.getHours();
+	            this.minute = parseInt(this.props.minute) || d.getMinutes();
 	            this.setAnsTime();
 	        }
 	    }, {
@@ -355,20 +355,12 @@
 
 	                that.touchMoveY = evt.pageY;
 
-	                that.touchCurItem.setTouchMoveEvtPageY(evt.pageY);
 	                that.touchMoveTime = +new Date();
 
 	                var moveY = evt.pageY - that.touchCurItem.getTouchStartY();
 	                var tempY = that.touchCurItem.getMoveY() + moveY;
 
-	                if (tempY > itemHeight * 6) {
-	                    tempY = itemHeight * 6;
-	                }
-	                if (tempY < -(that.touchCurItem.getObjBounding().height - itemHeight)) {
-	                    tempY = -(that.touchCurItem.getObjBounding().height - itemHeight);
-	                }
-
-	                that.touchCurItem.moveElement(0, tempY);
+	                that.touchCurItem.moveElement2(0, tempY);
 	            });
 
 	            document.addEventListener('touchend', function (event) {
@@ -403,29 +395,30 @@
 	        key: 'calTimeCallback',
 	        value: function calTimeCallback() {
 	            if (this.month == 1 || this.month == 3 || this.month == 5 || this.month == 7 || this.month == 8 || this.month == 10 || this.month == 12) {
-	                this.objTimeArr[2].setTimeCount(31);
+	                this.objTimeArr[2].setEndNum(31);
+	                this.objTimeArr[2].setTimeCount();
 	            } else if (this.month == 4 || this.month == 6 || this.month == 9 || this.month == 11) {
-	                this.objTimeArr[2].setTimeCount(30);
+	                this.objTimeArr[2].setEndNum(30);
 	                if (this.date > 30) {
 	                    this.objTimeArr[2].setTimeVal(30);
-	                    this.objTimeArr[2].setTranslate();
 	                    this.date = 30;
 	                }
+	                this.objTimeArr[2].setTimeCount();
 	            } else if (this.month == 2) {
 	                if (this.year % 4 == 0 && this.year % 100 != 0 || this.year % 400 == 0) {
-	                    this.objTimeArr[2].setTimeCount(29);
+	                    this.objTimeArr[2].setEndNum(29);
 	                    if (this.date > 29) {
 	                        this.objTimeArr[2].setTimeVal(29);
-	                        this.objTimeArr[2].setTranslate();
 	                        this.date = 29;
 	                    }
+	                    this.objTimeArr[2].setTimeCount();
 	                } else {
-	                    this.objTimeArr[2].setTimeCount(28);
+	                    this.objTimeArr[2].setEndNum(28);
 	                    if (this.date > 28) {
 	                        this.objTimeArr[2].setTimeVal(28);
-	                        this.objTimeArr[2].setTranslate();
 	                        this.date = 28;
 	                    }
+	                    this.objTimeArr[2].setTimeCount();
 	                }
 	            }
 	            this.setAnsTime();
@@ -546,8 +539,10 @@
 	    this.transformY = 0; //存储style.transform里的y
 	    this.moveY = 0;
 	    this.itemHeight = 34;
-	    this.offset = 3;
+	    this.offset = 4;
 	    this.timeVal = 0;
+	    this.startTimeVal = 0; //循环块的开始
+	    this.endTimeVal = 0; //循环块的结束
 	    this.timeMask = null; //遮罩
 	    this.timeContainer = null; //时间内容容器
 	    this.parentContainer = null; //最外层容器
@@ -557,8 +552,8 @@
 	    this.touchStartY = 0; //开始触摸时的transformY
 	    this.touchStartTime = 0; //开始触摸的时间
 	    this.inertia = false; //是否惯性滑动
-	    this.touchMoveEvtPageY = 0; //记录touchMove时evt.pageY
-	    this.touchMoveUpDown = null; //touchMove是向上还是向下,1上2下
+
+	    this.tempTimeVal = 0;
 	}
 	TimeItem.defaults = {
 	    startNum: '',
@@ -578,25 +573,76 @@
 	        this.touchStartEvt();
 	    },
 	    renderHtml: function renderHtml() {
-	        this.setTimeCount(this.options.endNum);
+	        this.setTimeCount();
 	    },
 	    setTimeVal: function setTimeVal(val) {
 	        this.timeVal = val;
 	    },
+	    setStartNum: function setStartNum(v) {
+	        this.options.startNum = v;
+	    },
+	    setEndNum: function setEndNum(v) {
+	        this.options.endNum = v;
+	    },
 
 	    setTranslate: function setTranslate() {
-	        var y = this.itemHeight * (this.options.startNum + this.offset - this.timeVal);
-	        this.moveElement(0, y);
+	        var y = -this.itemHeight;
+	        this.timeContainer.style.webkitTransform = 'translate(' + 0 + 'px,' + y + 'px)';
+	        this.timeContainer.style.transform = 'translate3d(' + 0 + 'px,' + y + 'px, 0)';
+	        this.transformY = y;
 	        this.moveY = y;
 	    },
 	    moveElement: function moveElement(x, y) {
 	        var x = Math.round(1000 * x) / 1000;
 	        var y = Math.round(1000 * y) / 1000;
+	        ///////
+	        var ty = (y - -this.itemHeight) / this.itemHeight;
+	        if (ty < 0) {
+	            ty = Math.ceil(ty);
+	        } else if (ty > 0) {
+	            ty = Math.floor(ty);
+	        }
+	        y = y - ty * this.itemHeight;
+	        var mod = ty % (this.options.endNum - this.options.startNum + 1);
+	        if (this.timeVal - mod < this.options.startNum) {
+	            this.timeVal = this.options.endNum + 1 - (Math.abs(mod) - (this.timeVal - this.options.startNum));
+	        } else if (this.timeVal - mod > this.options.endNum) {
+	            this.timeVal = this.options.startNum - 1 + (Math.abs(mod) - (this.options.endNum - this.timeVal));
+	        } else {
+	            this.timeVal = this.timeVal - mod;
+	        }
+	        this.setTimeCount();
+	        //////
+	        this.timeContainer.style.webkitTransform = 'translate(' + x + 'px,' + y + 'px)';
+	        this.timeContainer.style.transform = 'translate3d(' + x + 'px,' + y + 'px, 0)';
+	        this.transformY = y;
+	        this.moveY = y;
+	    },
+	    moveElement2: function moveElement2(x, y) {
+	        var x = Math.round(1000 * x) / 1000;
+	        var y = Math.round(1000 * y) / 1000;
 
+	        var ty = (y - -this.itemHeight) / this.itemHeight;
+	        if (ty < 0) {
+	            ty = Math.ceil(ty);
+	        } else if (ty > 0) {
+	            ty = Math.floor(ty);
+	        }
+	        y = y - ty * this.itemHeight;
+	        var mod = ty % (this.options.endNum - this.options.startNum + 1);
+	        if (this.tempTimeVal - mod < this.options.startNum) {
+	            this.timeVal = this.options.endNum + 1 - (Math.abs(mod) - (this.tempTimeVal - this.options.startNum));
+	        } else if (this.tempTimeVal - mod > this.options.endNum) {
+	            this.timeVal = this.options.startNum - 1 + (Math.abs(mod) - (this.options.endNum - this.tempTimeVal));
+	        } else {
+	            this.timeVal = this.tempTimeVal - mod;
+	        }
+	        this.setTimeCount();
 	        this.timeContainer.style.webkitTransform = 'translate(' + x + 'px,' + y + 'px)';
 	        this.timeContainer.style.transform = 'translate3d(' + x + 'px,' + y + 'px, 0)';
 	        this.transformY = y;
 	    },
+
 	    setTouching: function setTouching(touching) {
 	        this.touching = touching;
 	    },
@@ -620,10 +666,9 @@
 	            var evt = event.touches[0] || event;
 	            that.touching = true;
 	            that.touchStartY = evt.pageY;
-	            that.touchMoveEvtPageY = evt.pageY; //touchMove初始值
-	            that.touchMoveUpDown = 0; //初始值为0
 	            that.touchStartTime = +new Date();
 	            that.options.touchStartCallback(that);
+	            that.tempTimeVal = that.timeVal;
 	        });
 	    },
 	    getTouchStartY: function getTouchStartY() {
@@ -637,14 +682,6 @@
 	    },
 	    setMoveY: function setMoveY() {
 	        this.moveY = this.transformY;
-	    },
-	    setTouchMoveEvtPageY: function setTouchMoveEvtPageY(y) {
-	        if (y < this.touchMoveEvtPageY) {
-	            this.touchMoveUpDown = 1; //向上滑
-	        } else if (y > this.touchMoveEvtPageY) {
-	            this.touchMoveUpDown = 2; //向下滑
-	        }
-	        this.touchMoveEvtPageY = y;
 	    },
 	    getObjBounding: function getObjBounding() {
 	        return this.objBounding;
@@ -674,7 +711,6 @@
 
 	        var y = this.moveY + speed;
 	        this.moveElement(0, y);
-	        this.moveY = y;
 
 	        if (Math.abs(speed) < 0.5) {
 	            speed = 0;
@@ -688,25 +724,9 @@
 	    },
 
 	    inBox: function inBox() {
-	        var maxY = 3 * this.itemHeight;
-	        var minY = -(this.objBounding.height - 4 * this.itemHeight);
 	        var delta = 0; //delta变化量
 	        var y = this.moveY;
-
-	        if (y > maxY) {
-	            delta = maxY - y;
-	        } else if (y < minY) {
-	            delta = minY - y;
-	        } else {
-	            //调整位置,使时间块位于中间
-	            // if(this.touchMoveUpDown == 1) {
-	            //     delta = Math.floor(y / this.itemHeight) * this.itemHeight - y;
-	            // }
-	            // else {
-	            //     delta = Math.ceil(y / this.itemHeight) * this.itemHeight - y;    
-	            // }
-	            delta = Math.round(y / this.itemHeight) * this.itemHeight - y;
-	        }
+	        delta = Math.round(y / this.itemHeight) * this.itemHeight - y;
 
 	        var start = 0;
 	        var during = 40;
@@ -714,8 +734,7 @@
 	        //变化量为0,不用动
 	        if (delta == 0) {
 	            this.inertia = false;
-
-	            this.calTime(init);
+	            this.calTime();
 	            return;
 	        }
 
@@ -732,7 +751,6 @@
 	        start++;
 	        var y = easeOutQuad(start, init, delta, during);
 	        this.moveElement(0, y);
-	        this.moveY = y;
 
 	        if (start < during) {
 	            requestAnimationFrame(function () {
@@ -744,19 +762,46 @@
 	        }
 	    },
 
-	    calTime: function calTime(y) {
-	        this.moveY = y;
-	        this.timeVal = this.options.startNum + this.offset - y / this.itemHeight;
+	    calTime: function calTime() {
 	        this.options.calTimeCallback(this.timeVal);
 	    },
+	    setTimeCount: function setTimeCount() {
+	        this.startTimeVal = this.timeVal - this.offset >= this.options.startNum ? this.timeVal - this.offset : this.options.endNum + 1 - (this.offset - (this.timeVal - this.options.startNum));
+	        this.endTimeVal = this.timeVal + this.offset <= this.options.endNum ? this.timeVal + this.offset : this.options.startNum - 1 + (this.offset - (this.options.endNum - this.timeVal));
 
-	    setTimeCount: function setTimeCount(cnt) {
-	        var content = [];
-	        this.options.endNum = cnt;
-	        for (var i = this.options.startNum; i <= this.options.endNum; i++) {
-	            content.push('<div class="time-item-content">' + addZero(i) + this.options.unit + '</div>');
+	        var content = [],
+	            i,
+	            j;
+	        var nodes = this.timeContainer.childNodes;
+	        if (nodes.length == 0) {
+	            if (this.startTimeVal < this.endTimeVal) {
+	                for (i = this.startTimeVal; i <= this.endTimeVal; i++) {
+	                    content.push('<div class="time-item-content">' + addZero(i) + this.options.unit + '</div>');
+	                }
+	            } else {
+	                for (i = this.startTimeVal; i <= this.options.endNum; i++) {
+	                    content.push('<div class="time-item-content">' + addZero(i) + this.options.unit + '</div>');
+	                }
+	                for (i = this.options.startNum; i <= this.endTimeVal; i++) {
+	                    content.push('<div class="time-item-content">' + addZero(i) + this.options.unit + '</div>');
+	                }
+	            }
+	            this.timeContainer.innerHTML = content.join('');
+	        } else {
+	            j = 0;
+	            if (this.startTimeVal < this.endTimeVal) {
+	                for (i = this.startTimeVal; i <= this.endTimeVal; i++) {
+	                    nodes[j++].innerHTML = addZero(i) + this.options.unit;
+	                }
+	            } else {
+	                for (i = this.startTimeVal; i <= this.options.endNum; i++) {
+	                    nodes[j++].innerHTML = addZero(i) + this.options.unit;
+	                }
+	                for (i = this.options.startNum; i <= this.endTimeVal; i++) {
+	                    nodes[j++].innerHTML = addZero(i) + this.options.unit;
+	                }
+	            }
 	        }
-	        this.timeContainer.innerHTML = content.join('');
 	    }
 	};
 
