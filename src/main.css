@@ -83,6 +83,7 @@ html, body {
 }
 .operate-container {
 	position: absolute;
+	z-index: 6;
 	display: -webkit-box;
 	display: -ms-flexbox;
 	display: -webkit-flex;
