@@ -3,7 +3,7 @@ function TimeItem(element, options) {
     this.options = options;
     this.transformY = 0;//存储style.transform里的y
     this.moveY = 0;
-    this.itemHeight = 34;
+    this.itemHeight = 40;
     this.offset = 3;
     this.timeVal = 0;
     this.startTimeVal = 0;//循环块的开始
