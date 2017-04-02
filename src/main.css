@@ -26,7 +26,7 @@ html, body {
 	position: fixed;
 	z-index: 2;
 	top: 50%;
-	margin-top: -119px;
+	margin-top: -85px;
 	background: #fff;
 }
 .time-item-container {
@@ -38,7 +38,7 @@ html, body {
 	display: block;
     position: relative;
     overflow: hidden;
-    height: 238px;
+    height: 170px;
 }
 .time-item-mask {
 	position: absolute;
@@ -50,7 +50,7 @@ html, body {
     background-image: -webkit-linear-gradient(top, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.6)), -webkit-linear-gradient(bottom, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.6));
     background-image: linear-gradient(to bottom, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.6)), linear-gradient(to top, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.6));
     background-position: top, bottom;
-    background-size: 100% 102px;
+    background-size: 100% 68px;
     background-repeat: no-repeat;
 }
 .time-item-contents {
@@ -73,7 +73,7 @@ html, body {
 .time-item-middle-bg {
 	position: absolute;
 	z-index: 3;
-	top: 102px;
+	top: 68px;
 	left: 0;
 	right: 0;
 	height: 34px;
