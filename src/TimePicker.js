@@ -3,10 +3,6 @@ import { TimeItem } from './TimeItem';
 import { getDateNumByMonthYear, addZero } from './Util';
 import './main.css';
 
-const winWidth = window.innerWidth;
-const winHeight = window.innerHeight;
-const itemHeight = 34;
-
 export default class TimePicker extends Component {
 	constructor(props) {
 		super(props);
