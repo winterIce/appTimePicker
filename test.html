@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+	<title>rotateY</title>
+	<meta charset="UTF-8" />
+	<meta name="renderer" content="webkit" />
+	<meta name="screen-orientation" content="portrait" />
+	<meta name="x5-orientation" content="portrait" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+	<style>
+	#stage {
+		perspective: 800px;
+		margin-bottom: 100px;
+	}
+	#container {
+		transform-style: preserve-3d;
+	}
+	.item {
+		width: 100px;
+		height: 50px;
+		background: #ccc;
+		transform: rotateX(-45deg);
+	}
+	#item2 {
+        width: 100px;
+        height: 50px;
+        background: #ccc;
+	    transform: perspective(800px);
+	    transform-origin: top;
+	    word-break: break-all;
+	    word-wrap: break-word;
+	}
+	#item3 {
+	    width: 100px;
+        height: 50px;
+        background: #ccc;
+	    transform: perspective(800px);
+	    transform-origin: bottom;
+	    word-break: break-all;
+	    word-wrap: break-word;
+	}
+	#c1 {
+		/*transform: translateY(-50px);*/
+	}
+	</style>
+</head>
+<body>
+    <div id="stage">
+        <div id="container">
+            <div class="item">
+                abcabcabcabcabcabc
+            </div>
+        </div>
+    </div>
+    <div>
+        <div id="item2">abcabcabcabcabcabc</div>
+        <div id="c1">
+	        <div id="item3">abcabcabcabcabcabc</div>
+        </div>
+    </div>
+    <script>
+    var item2 = document.getElementById('item2');
+    var item3 = document.getElementById('item3');
+    var c1 = document.getElementById('c1');
+
+    var touchStartY = 0, touching = false, alpha = 0, touchStartAlpha = 0;
+    document.addEventListener('touchstart', function(event) {
+        var evt = event.touches[0] || event;
+        touching = true;
+        touchStartY = evt.pageY;
+    });
+    document.addEventListener('touchmove', function(event) {
+    	if(!touching) {
+    		return;
+    	}
+    	var evt = event.touches[0] || event;
+        var ty = evt.pageY;
+        var delta = ty - touchStartY;
+        var ta = touchStartAlpha - delta;
+        if(ta < 0) {
+        	alpha = 0;
+        }
+        else if(ta > 90) {
+        	alpha = 90;
+        }
+        else {
+        	 alpha = ta;
+        }
+        var rad = alpha * Math.PI / 180;
+        item2.style.transform = 'perspective(8000px) rotateX(' + (-alpha) + 'deg)';
+        item3.style.transform = 'perspective(8000px) rotateX(' + alpha + 'deg)';
+        var dis = -2 * (50 - 50 * Math.cos(rad));
+        c1.style.transform = 'translateY(' + dis + 'px)';
+    });
+    document.addEventListener('touchend', function(event) {
+    	touching = false;
+    	touchStartAlpha = alpha;
+    });
+    </script>
+</body>
+</html>

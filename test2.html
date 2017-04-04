@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+	<title>rotateY</title>
+	<meta charset="UTF-8" />
+	<meta name="renderer" content="webkit" />
+	<meta name="screen-orientation" content="portrait" />
+	<meta name="x5-orientation" content="portrait" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+	<style>
+	    #loading-container {
+            width: 24px;
+            height: 24px;
+            position: absolute;
+            left: 50%;
+            margin-left: -12px;
+            top: -24px;
+        }
+        #loading {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #ff6f06;
+            border-radius: 100%;
+            border-bottom: none;   
+            animation: rotation 1s infinite linear;
+        }
+        .my-transition {
+            transition: transform 0.3s;
+        }
+        @keyframes rotation
+        {
+            from {transform: rotate(0deg);}
+            to {transform: rotate(360deg);}
+        }
+	</style>
+</head>
+<body>
+    <div id="loading-container">
+        <div id="loading"></div>
+    </div>
+    
+    <script>
+    var loadingContainer = document.getElementById('loading-container');
+    var touchStartY = 0, touching = false, translateY, canTouch = true;
+    document.addEventListener('touchstart', function(event) {
+        if(!canTouch) return;
+        var evt = event.touches[0] || event;
+        touching = true;
+        touchStartY = evt.pageY;
+        loadingContainer.className = '';
+    });
+    document.addEventListener('touchmove', function(event) {
+    	if(!touching || !canTouch) {
+    		return;
+    	}
+    	var evt = event.touches[0] || event;
+        var ty = evt.pageY;
+        var delta = ty - touchStartY;
+
+        if(delta > 400) {
+            translateY = 180;
+        }
+        else {
+            translateY = easeOutQuad(delta, 0, 180, 400);
+        }
+        loadingContainer.style.transform = 'translateY('+translateY+'px)';
+    });
+    document.addEventListener('touchend', function(event) {
+        if(!touching || !canTouch) {
+            return;
+        }
+    	touching = false;
+        loadingContainer.className = 'my-transition';
+        if(translateY > 90) {
+            translateY = 90;
+            canTouch = false;
+            setTimeout(function() {
+                loadingContainer.style.transform = 'translateY(0px)';
+                canTouch = true;
+            }, 2000);
+        }
+        else {
+            translateY = 0;
+        }
+    	loadingContainer.style.transform = 'translateY(' + translateY + 'px)'; 
+    });
+    function easeOutQuad(t, b, c, d) {
+        return -c *(t /= d)*(t-2) + b;
+    }
+    </script>
+</body>
+</html>
