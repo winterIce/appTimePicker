@@ -90,7 +90,7 @@ TimeItem.prototype = {
         this.transformY = y;
         this.moveY = y;
     },
-    moveElement2(x, y) {
+    moveElementWhenMove(x, y) {
         var x = Math.round(1000 * x) / 1000;
         var y = Math.round(1000 * y) / 1000;
 

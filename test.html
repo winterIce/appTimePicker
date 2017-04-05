@@ -9,17 +9,17 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
 	<style>
 	#stage {
-		perspective: 800px;
+		/*perspective: 800px;*/
 		margin-bottom: 100px;
 	}
 	#container {
-		transform-style: preserve-3d;
+		/*transform-style: preserve-3d;*/
 	}
 	.item {
 		width: 100px;
 		height: 50px;
 		background: #ccc;
-		transform: rotateX(-45deg);
+		transform: perspective(800px) rotateX(-45deg);
 	}
 	#item2 {
         width: 100px;

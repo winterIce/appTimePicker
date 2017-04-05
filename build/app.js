@@ -356,7 +356,7 @@
 	                var moveY = evt.pageY - that.touchCurItem.getTouchStartY();
 	                var tempY = that.touchCurItem.getMoveY() + moveY;
 
-	                that.touchCurItem.moveElement2(0, tempY);
+	                that.touchCurItem.moveElementWhenMove(0, tempY);
 	            });
 
 	            document.addEventListener('touchend', function (event) {
@@ -614,7 +614,7 @@
 	        this.transformY = y;
 	        this.moveY = y;
 	    },
-	    moveElement2: function moveElement2(x, y) {
+	    moveElementWhenMove: function moveElementWhenMove(x, y) {
 	        var x = Math.round(1000 * x) / 1000;
 	        var y = Math.round(1000 * y) / 1000;
 

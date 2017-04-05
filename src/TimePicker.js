@@ -151,7 +151,7 @@ export default class TimePicker extends Component {
             var moveY = evt.pageY - that.touchCurItem.getTouchStartY();
             var tempY = that.touchCurItem.getMoveY() + moveY;
             
-            that.touchCurItem.moveElement2(0, tempY);
+            that.touchCurItem.moveElementWhenMove(0, tempY);
         });
         
         document.addEventListener('touchend', function(event) {
