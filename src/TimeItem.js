@@ -43,7 +43,7 @@ TimeItem.prototype = {
     renderHtml: function() {
         this.setTimeCount(this.options.endNum);
     },
-    setTimeVal(val) {
+    setTimeVal: function(val) {
         this.timeVal = val;
     },
     setTranslate: function() {

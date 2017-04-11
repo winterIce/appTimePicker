@@ -583,7 +583,6 @@
 	    setTimeVal: function setTimeVal(val) {
 	        this.timeVal = val;
 	    },
-
 	    setTranslate: function setTranslate() {
 	        var y = this.itemHeight * (this.options.startNum + this.offset - this.timeVal);
 	        this.moveElement(0, y);
