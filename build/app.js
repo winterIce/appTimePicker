@@ -584,7 +584,6 @@
 	    setEndNum: function setEndNum(v) {
 	        this.options.endNum = v;
 	    },
-
 	    setTranslate: function setTranslate() {
 	        var y = -this.itemHeight;
 	        this.timeContainer.style.webkitTransform = 'translate(' + 0 + 'px,' + y + 'px)';
@@ -642,7 +641,6 @@
 	        this.timeContainer.style.transform = 'translate3d(' + x + 'px,' + y + 'px, 0)';
 	        this.transformY = y;
 	    },
-
 	    setTouching: function setTouching(touching) {
 	        this.touching = touching;
 	    },
