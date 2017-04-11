@@ -26,6 +26,11 @@ export default class TimePicker extends Component {
                 width: 0,
                 height: 0,
             },
+            yearOpen: 1,//1打开2关闭
+            monthOpen: 1,
+            dateOpen: 1,
+            hourOpen: 1,
+            minuteOpen: 1,
 		};
 	}
 
@@ -37,6 +42,13 @@ export default class TimePicker extends Component {
         this.hour = parseInt(this.props.hour) || d.getHours();
         this.minute = parseInt(this.props.minute) || d.getMinutes();
         this.setAnsTime();
+        this.setState({
+            yearOpen: parseInt(this.props.yearOpen) || 1,
+            monthOpen: parseInt(this.props.monthOpen) || 1,
+            dateOpen: parseInt(this.props.dateOpen) || 1,
+            hourOpen: parseInt(this.props.hourOpen) || 1,
+            minuteOpen: parseInt(this.props.minuteOpen) || 1,
+        });
     }
 	componentDidMount() {
         var that = this;
@@ -234,7 +246,7 @@ export default class TimePicker extends Component {
                         <div ref="okBtn" className="operate-btn" onClick={this.props.cancelHandler.bind(this)}>取消</div>
                         <div ref="cancelBtn" className="operate-btn" onClick={this.okHandler.bind(this)}>确定</div>
                     </div>
-    			    <div className="time-item-container">
+    			    <div className="time-item-container" style={this.state.yearOpen == 1 ? {} : {display: 'none'}}>
                         <div className="time-item">
                             <div className="time-item-mask" ref="yearItemMask"></div>
                             <div className="time-item-middle-bg"></div>
@@ -242,7 +254,7 @@ export default class TimePicker extends Component {
                             </div>
                         </div>
                     </div>
-    			    <div className="time-item-container">
+    			    <div className="time-item-container" style={this.state.monthOpen == 1 ? {} : {display: 'none'}}>
                         <div className="time-item">
                             <div className="time-item-mask" ref="monthItemMask"></div>
                             <div className="time-item-middle-bg"></div>
@@ -250,7 +262,7 @@ export default class TimePicker extends Component {
                             </div>
                         </div>
                     </div>
-    			    <div className="time-item-container">
+    			    <div className="time-item-container" style={this.state.dateOpen == 1 ? {} : {display: 'none'}}>
                         <div className="time-item">
                             <div className="time-item-mask" ref="dateItemMask"></div>
                             <div className="time-item-middle-bg"></div>
@@ -258,7 +270,7 @@ export default class TimePicker extends Component {
                             </div>
                         </div>
                     </div>
-    			    <div className="time-item-container">
+    			    <div className="time-item-container" style={this.state.hourOpen == 1 ? {} : {display: 'none'}}>
                         <div className="time-item">
                             <div className="time-item-mask" ref="hourItemMask"></div>
                             <div className="time-item-middle-bg"></div>
@@ -266,7 +278,7 @@ export default class TimePicker extends Component {
                             </div>
                         </div>
                     </div>
-    			    <div className="time-item-container">
+    			    <div className="time-item-container" style={this.state.minuteOpen == 1 ? {} : {display: 'none'}}>
                         <div className="time-item">
                             <div className="time-item-mask" ref="minuteItemMask"></div>
                             <div className="time-item-middle-bg"></div>

@@ -157,7 +157,7 @@
 					_react2.default.createElement(
 						'div',
 						{ ref: 'timeOuter', style: this.state.showTime ? {} : { display: 'none' } },
-						_react2.default.createElement(_TimePicker2.default, { okHandler: this.okHandler.bind(this), cancelHandler: this.cancelHandler.bind(this), hour: '8', minute: '30' })
+						_react2.default.createElement(_TimePicker2.default, { okHandler: this.okHandler.bind(this), cancelHandler: this.cancelHandler.bind(this), yearOpen: '1', monthOpen: '1', dateOpen: '1', hourOpen: '1', minuteOpen: '1', hour: '8', minute: '30' })
 					)
 				);
 			}
@@ -225,7 +225,12 @@
 	                bottom: 0,
 	                width: 0,
 	                height: 0
-	            }
+	            },
+	            yearOpen: 1, //1打开2关闭
+	            monthOpen: 1,
+	            dateOpen: 1,
+	            hourOpen: 1,
+	            minuteOpen: 1
 	        };
 	        return _this;
 	    }
@@ -240,6 +245,13 @@
 	            this.hour = parseInt(this.props.hour) || d.getHours();
 	            this.minute = parseInt(this.props.minute) || d.getMinutes();
 	            this.setAnsTime();
+	            this.setState({
+	                yearOpen: parseInt(this.props.yearOpen) || 1,
+	                monthOpen: parseInt(this.props.monthOpen) || 1,
+	                dateOpen: parseInt(this.props.dateOpen) || 1,
+	                hourOpen: parseInt(this.props.hourOpen) || 1,
+	                minuteOpen: parseInt(this.props.minuteOpen) || 1
+	            });
 	        }
 	    }, {
 	        key: 'componentDidMount',
@@ -457,7 +469,7 @@
 	                    ),
 	                    _react2.default.createElement(
 	                        'div',
-	                        { className: 'time-item-container' },
+	                        { className: 'time-item-container', style: this.state.yearOpen == 1 ? {} : { display: 'none' } },
 	                        _react2.default.createElement(
 	                            'div',
 	                            { className: 'time-item' },
@@ -468,7 +480,7 @@
 	                    ),
 	                    _react2.default.createElement(
 	                        'div',
-	                        { className: 'time-item-container' },
+	                        { className: 'time-item-container', style: this.state.monthOpen == 1 ? {} : { display: 'none' } },
 	                        _react2.default.createElement(
 	                            'div',
 	                            { className: 'time-item' },
@@ -479,7 +491,7 @@
 	                    ),
 	                    _react2.default.createElement(
 	                        'div',
-	                        { className: 'time-item-container' },
+	                        { className: 'time-item-container', style: this.state.dateOpen == 1 ? {} : { display: 'none' } },
 	                        _react2.default.createElement(
 	                            'div',
 	                            { className: 'time-item' },
@@ -490,7 +502,7 @@
 	                    ),
 	                    _react2.default.createElement(
 	                        'div',
-	                        { className: 'time-item-container' },
+	                        { className: 'time-item-container', style: this.state.hourOpen == 1 ? {} : { display: 'none' } },
 	                        _react2.default.createElement(
 	                            'div',
 	                            { className: 'time-item' },
@@ -501,7 +513,7 @@
 	                    ),
 	                    _react2.default.createElement(
 	                        'div',
-	                        { className: 'time-item-container' },
+	                        { className: 'time-item-container', style: this.state.minuteOpen == 1 ? {} : { display: 'none' } },
 	                        _react2.default.createElement(
 	                            'div',
 	                            { className: 'time-item' },
