@@ -45,13 +45,13 @@ TimeItem.prototype = {
     renderHtml: function() {
         this.setTimeCount();
     },
-    setTimeVal(val) {
+    setTimeVal: function(val) {
         this.timeVal = val;
     },
-    setStartNum(v) {
+    setStartNum: function(v) {
         this.options.startNum = v;
     },
-    setEndNum(v) {
+    setEndNum: function(v) {
         this.options.endNum = v;
     },
     setTranslate: function() {
@@ -90,7 +90,7 @@ TimeItem.prototype = {
         this.transformY = y;
         this.moveY = y;
     },
-    moveElementWhenMove(x, y) {
+    moveElementWhenMove: function(x, y) {
         var x = Math.round(1000 * x) / 1000;
         var y = Math.round(1000 * y) / 1000;
 
