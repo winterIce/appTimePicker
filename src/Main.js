@@ -8,6 +8,7 @@ export default class Main extends Component {
 			startTime: '',
 			showTime: false,
 		}
+		console.log('test');
 	}
 	componentDidMount() {
 		var that = this;
